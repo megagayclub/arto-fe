@@ -16,9 +16,6 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    permissions: # <--- [추가] 푸시(쓰기) 권한 명시
-      contents: read
-      packages: write 
     steps:
       # github repository에서 checkout
       - uses: actions/checkout@v3
