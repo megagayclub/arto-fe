@@ -4,7 +4,7 @@ import { useState } from 'react';
 import axios, { AxiosError } from 'axios';
 
 // API 통신을 위한 기본 URL 설정 (실제 서버 주소로 변경 필요)
-const API_BASE_URL = 'http://localhost:8080/users/'; 
+const API_BASE_URL = 'http://localhost:8080/api/v1'; 
 
 // SignUpRequestDto와 일치하는 타입을 정의합니다.
 // SignUpPage에서 'signUpData' 객체를 만들 때 사용한 필드들입니다.
