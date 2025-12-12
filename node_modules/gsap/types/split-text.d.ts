@@ -8,6 +8,17 @@ declare class SplitText {
 
   constructor(target: gsap.DOMTarget, vars?: SplitText.Vars);
 
+    /**
+     * Stops any autoSplit behavior (removes internal listeners for resizes and font loading)
+     *
+     * ```js
+     * split.kill();
+     * ```
+     *
+     * @memberof SplitText
+     * @link https://greensock.com/docs/v3/Plugins/SplitText/kill()
+     */
+    kill(): void;
 
   /**
    * Reverts the innerHTML to the original content.
@@ -105,21 +116,3 @@ declare module "gsap/all" {
   export * from "gsap/SplitText";
 }
 
-declare module "gsap-trial/SplitText" {
-  export * from "gsap/SplitText";
-  export { SplitText as default } from "gsap/SplitText";
-}
-
-declare module "gsap-trial/src/SplitText" {
-  export * from "gsap/SplitText";
-  export { SplitText as default } from "gsap/SplitText";
-}
-
-declare module "gsap-trial/dist/SplitText" {
-  export * from "gsap/SplitText";
-  export { SplitText as default } from "gsap/SplitText";
-}
-
-declare module "gsap-trial/all" {
-  export * from "gsap/SplitText";
-}
