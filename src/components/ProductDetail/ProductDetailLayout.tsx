@@ -1,110 +1,110 @@
-// src/components/ProductDetail/ProductDetail.tsx
+// src/hooks/useArtworkDetail.ts
+import { useEffect, useState } from "react";
+import axios from "axios";
 
-import React from "react";
-import { DUMMY_PRODUCT_DETAIL, ProductDetailType } from "../data/ProductData";
-import {
-  PageLayout,
-  LeftSidebar,
-  SidebarIcon,
-  HamburgerMenu,
-  MainContent,
-  ImageArea,
-  InfoArea,
-  Title,
-  ArtistName,
-  InfoTable,
-  InfoRow,
-  PriceText,
-  ButtonGroup,
-  BuyButton,
-  ActionButton,
-} from "./ProductDetailStyles";
+// ========================
+// 프론트에서 사용하는 타입
+// ========================
+export type ProductDetailType = {
+  id: number;
+  title: string;
+  description: string;
+  artist: string;
 
-// 아이콘 대체 문자 (실제로는 react-icons 등을 사용합니다)
-const ICON_HOME = "🏠";
-const ICON_DOLLAR = "$";
-const ICON_CALENDAR = "📅";
-const ICON_EYE = "👁️";
-const ICON_MAIL = "✉️";
-const ICON_HISTORY = "↺";
-const ICON_CLOSE = "✕";
-const ICON_HEART = "🤍"; // 좋아요 아이콘
+  price: number;
+  shippingCost: number;
+  shippingMethod: string;
 
-// 작품 정보 표시 컴포넌트
-const ProductInfoTable: React.FC<{ data: ProductDetailType }> = ({ data }) => {
-  // 데이터 배열 형태로 변환
-  const infoRows = [
-    { label: "작품명 | Title", value: data.title },
-    { label: "작가명 | Artist", value: data.artist },
-    { label: "제작년 | Year", value: data.year },
-    { label: "장르 | Genre", value: data.genre },
-    { label: "소재 | Medium", value: data.medium },
-    { label: "액자 | Frame", value: data.frame },
-    { label: "사이즈 | Size", value: data.size },
-    {
-      label: "배송비 | Shipping Cost",
-      value: `${data.shippingCost.toLocaleString()}₩`,
-    },
-    { label: "배송방법 | Shipping", value: data.shippingMethod },
-  ];
+  size: string;
+  frame: string; // DTO에 없음 → 빈값 처리
+  medium: string; // DTO에 없음 → 빈값 처리
+  genre: string; // DTO에 없음 → 빈값 처리
+  year: string; // DTO에 없음 → 빈값 처리
 
-  return (
-    <InfoTable>
-      {infoRows.map((row, index) => (
-        <InfoRow key={index}>
-          <span>{row.label}</span>
-          <span>{row.value}</span>
-        </InfoRow>
-      ))}
-    </InfoTable>
-  );
+  imagePlaceholder: string;
+
+  // 태그 정보
+  colors: string[];
+  spaces: string[];
+  moods: string[];
 };
 
-export const ProductDetailLayout: React.FC = () => {
-  const product = DUMMY_PRODUCT_DETAIL;
+type UseArtworkDetailReturn = {
+  artworkDetail: ProductDetailType | null;
+  isLoading: boolean;
+  error: string | null;
+};
 
-  return (
-    <PageLayout>
-      {/* 2. 메인 콘텐츠 */}
-      <MainContent>
-        {/* 2-1. 이미지 영역 */}
-        <ImageArea>
-          <img src={product.imagePlaceholder} alt={product.title} />
-          <p style={{ marginTop: "20px", fontSize: "12px", color: "#666" }}>
-            ©2017 김·지영. All rights reserved. 작품 이미지의 무단 사용 및
-            전재를 금합니다.
-          </p>
-        </ImageArea>
+const API_BASE_URL = "http://localhost:8080";
 
-        {/* 2-2. 정보 및 구매 영역 */}
-        <InfoArea>
-          {/* 작품 제목 및 작가 */}
-          <Title>작품명 | Title</Title>
-          <ArtistName>{product.title}</ArtistName>
+export const useArtworkDetail = (artworkId: number): UseArtworkDetailReturn => {
+  const [artworkDetail, setArtworkDetail] = useState<ProductDetailType | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-          <Title>작가명 | Artist</Title>
-          <ArtistName>킴·지영 | Jiyoung Kim</ArtistName>
+  useEffect(() => {
+    if (!artworkId) return;
 
-          {/* 정보 테이블 */}
-          <ProductInfoTable data={product} />
+    const controller = new AbortController();
 
-          {/* 가격 */}
-          <Title>판매가격 | Price</Title>
-          <PriceText>{product.price.toLocaleString()}₩</PriceText>
+    async function fetchDetail() {
+      setIsLoading(true);
+      setError(null);
 
-          {/* 버튼 그룹 */}
-          <ButtonGroup>
-            <ActionButton>
-              {ICON_HEART}
-              &nbsp;
-              <span style={{ fontSize: "14px" }}>문의하기</span>
-            </ActionButton>
-            <BuyButton>카트에 넣기</BuyButton>
-          </ButtonGroup>
-        </InfoArea>
-      </MainContent>
+      try {
+        const res = await axios.get(
+          `${API_BASE_URL}/api/v1/artworks/${artworkId}`,
+          {
+            signal: controller.signal,
+          }
+        );
 
-      {/* 오른쪽 사이드바와 하단 연관 작품은 생략 (확장 가능 지점) */}
-    </PageLayout>
-  );
+        const data = res.data;
+
+        // ========================
+        // DTO → ProductDetailType 매핑
+        // ========================
+        const mapped: ProductDetailType = {
+          id: data.artworkId,
+          title: data.title,
+          description: data.description,
+          artist: data.artistName,
+
+          price: Number(data.price),
+          shippingCost: Number(data.shippingCost),
+          shippingMethod: data.shippingMethod,
+
+          // 프론트 요구 스펙 중 DTO에 없는 필드는 빈값 처리
+          size: data.dimensions ?? "",
+          frame: "",
+          medium: "",
+          genre: "",
+          year: "",
+
+          imagePlaceholder: data.thumbnailImageUrl,
+
+          colors: data.colors ?? [],
+          spaces: data.spaces ?? [],
+          moods: data.moods ?? [],
+        };
+
+        setArtworkDetail(mapped);
+      } catch (err: any) {
+        console.error("작품 상세 API 오류:", err);
+        const msg =
+          err?.response?.data?.message ??
+          err?.message ??
+          "작품 정보를 불러오는 중 오류가 발생했습니다.";
+        setError(msg);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchDetail();
+
+    return () => controller.abort();
+  }, [artworkId]);
+
+  return { artworkDetail, isLoading, error };
 };
