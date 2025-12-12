@@ -2,12 +2,13 @@
 
 import React from "react";
 // ProductDetailType과 useArtworkDetail을 통합된 훅 파일에서 임포트
-import { ProductDetailType, useArtworkDetail } from "../../hooks/useArtworkDetail";
+import {
+  ProductDetailType,
+  useArtworkDetail,
+} from "../../hooks/useArtworkDetail";
+
 import {
   PageLayout,
-  // LeftSidebar, // 사용되지 않아 제거
-  // SidebarIcon, // 사용되지 않아 제거
-  // HamburgerMenu, // 사용되지 않아 제거
   MainContent,
   ImageArea,
   InfoArea,
@@ -22,7 +23,6 @@ import {
 } from "./ProductDetailStyles";
 
 // 아이콘 대체 문자 (실제로는 react-icons 등을 사용합니다)
-// 사용되지 않는 아이콘은 제거했습니다.
 const ICON_HEART = "🤍"; // 좋아요 아이콘
 
 // 작품 정보 표시 컴포넌트
@@ -55,7 +55,8 @@ const ProductInfoTable: React.FC<{ data: ProductDetailType }> = ({ data }) => {
   );
 };
 
-// 임시로 작품 ID를 1로 지정합니다. 실제 환경에서는 URL 파라미터 등을 사용합니다.
+// 🔧 임시로 작품 ID를 1로 지정합니다.
+// 실제 환경에서는 react-router의 useParams() 등을 사용하여 URL에서 artworkId를 가져오는 방식으로 변경하면 됩니다.
 const MOCK_ARTWORK_ID = 1;
 
 export const ProductDetailLayout: React.FC = () => {
@@ -72,7 +73,7 @@ export const ProductDetailLayout: React.FC = () => {
       <PageLayout>
         <MainContent>
           <p>작품 정보를 불러오는 중입니다...</p>
-          {/* 스켈레톤 UI를 여기에 추가하여 사용자 경험을 개선할 수 있습니다. */}
+          {/* TODO: 스켈레톤 UI를 추가하여 사용자 경험을 개선할 수 있습니다. */}
         </MainContent>
       </PageLayout>
     );
@@ -109,8 +110,8 @@ export const ProductDetailLayout: React.FC = () => {
         <ImageArea>
           <img src={product.imagePlaceholder} alt={product.title} />
           <p style={{ marginTop: "20px", fontSize: "12px", color: "#666" }}>
-            ©{product.year} {product.artist}. All rights reserved. 작품 이미지의 무단 사용 및
-            전재를 금합니다.
+            ©{product.year} {product.artist}. All rights reserved. 작품 이미지의 무단
+            사용 및 전재를 금합니다.
           </p>
         </ImageArea>
 
