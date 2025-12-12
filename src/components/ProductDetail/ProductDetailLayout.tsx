@@ -1,12 +1,13 @@
 // src/components/ProductDetail/ProductDetail.tsx
 
 import React from "react";
-import { DUMMY_PRODUCT_DETAIL, ProductDetailType } from "../data/ProductData";
+// ProductDetailType과 useArtworkDetail을 통합된 훅 파일에서 임포트
+import { ProductDetailType, useArtworkDetail } from "../../hooks/useArtworkDetail";
 import {
   PageLayout,
-  LeftSidebar,
-  SidebarIcon,
-  HamburgerMenu,
+  // LeftSidebar, // 사용되지 않아 제거
+  // SidebarIcon, // 사용되지 않아 제거
+  // HamburgerMenu, // 사용되지 않아 제거
   MainContent,
   ImageArea,
   InfoArea,
@@ -21,13 +22,7 @@ import {
 } from "./ProductDetailStyles";
 
 // 아이콘 대체 문자 (실제로는 react-icons 등을 사용합니다)
-const ICON_HOME = "🏠";
-const ICON_DOLLAR = "$";
-const ICON_CALENDAR = "📅";
-const ICON_EYE = "👁️";
-const ICON_MAIL = "✉️";
-const ICON_HISTORY = "↺";
-const ICON_CLOSE = "✕";
+// 사용되지 않는 아이콘은 제거했습니다.
 const ICON_HEART = "🤍"; // 좋아요 아이콘
 
 // 작품 정보 표시 컴포넌트
@@ -60,9 +55,52 @@ const ProductInfoTable: React.FC<{ data: ProductDetailType }> = ({ data }) => {
   );
 };
 
-export const ProductDetailLayout: React.FC = () => {
-  const product = DUMMY_PRODUCT_DETAIL;
+// 임시로 작품 ID를 1로 지정합니다. 실제 환경에서는 URL 파라미터 등을 사용합니다.
+const MOCK_ARTWORK_ID = 1;
 
+export const ProductDetailLayout: React.FC = () => {
+  // 커스텀 훅을 사용하여 데이터 로드 및 상태 관리
+  const {
+    artworkDetail: product,
+    isLoading,
+    error,
+  } = useArtworkDetail(MOCK_ARTWORK_ID);
+
+  // 1. 로딩 상태 처리
+  if (isLoading) {
+    return (
+      <PageLayout>
+        <MainContent>
+          <p>작품 정보를 불러오는 중입니다...</p>
+          {/* 스켈레톤 UI를 여기에 추가하여 사용자 경험을 개선할 수 있습니다. */}
+        </MainContent>
+      </PageLayout>
+    );
+  }
+
+  // 2. 에러 상태 처리
+  if (error) {
+    return (
+      <PageLayout>
+        <MainContent>
+          <p style={{ color: "red", padding: "20px" }}>오류 발생: {error}</p>
+        </MainContent>
+      </PageLayout>
+    );
+  }
+
+  // 3. 데이터가 없지만 에러도 아닌 경우 처리 (e.g., 404 Not Found)
+  if (!product) {
+    return (
+      <PageLayout>
+        <MainContent>
+          <p>작품 정보를 찾을 수 없습니다.</p>
+        </MainContent>
+      </PageLayout>
+    );
+  }
+
+  // 4. 성공적으로 데이터 로드 완료
   return (
     <PageLayout>
       {/* 2. 메인 콘텐츠 */}
@@ -71,7 +109,7 @@ export const ProductDetailLayout: React.FC = () => {
         <ImageArea>
           <img src={product.imagePlaceholder} alt={product.title} />
           <p style={{ marginTop: "20px", fontSize: "12px", color: "#666" }}>
-            ©2017 김·지영. All rights reserved. 작품 이미지의 무단 사용 및
+            ©{product.year} {product.artist}. All rights reserved. 작품 이미지의 무단 사용 및
             전재를 금합니다.
           </p>
         </ImageArea>
@@ -83,7 +121,7 @@ export const ProductDetailLayout: React.FC = () => {
           <ArtistName>{product.title}</ArtistName>
 
           <Title>작가명 | Artist</Title>
-          <ArtistName>킴·지영 | Jiyoung Kim</ArtistName>
+          <ArtistName>{product.artist}</ArtistName>
 
           {/* 정보 테이블 */}
           <ProductInfoTable data={product} />

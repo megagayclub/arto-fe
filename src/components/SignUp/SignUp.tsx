@@ -1,4 +1,5 @@
-// src/components/SignUp/SignUp.tsx
+// src/components/SignUp/SignUp.tsx (수정된 최종 코드)
+
 import React, { ReactNode, FormEvent } from "react";
 import {
   PageWrapper,
@@ -25,7 +26,7 @@ const ICON_CHECK = "✓"; // 체크 아이콘
 
 // --- 하위 컴포넌트 정의 ---
 
-// 1. 레이아웃 (Base Component)
+// 1. 레이아웃 (Base Component) (생략 없음)
 interface LayoutProps {
   children: ReactNode;
 }
@@ -40,7 +41,7 @@ const SignUpComponentBase: React.FC<LayoutProps> = ({ children }) => {
   );
 };
 
-// 2. 폼 컨테이너
+// 2. 폼 컨테이너 (생략 없음)
 interface FormProps {
   onSubmit: (e: FormEvent) => void;
   children: ReactNode;
@@ -49,7 +50,7 @@ const RegistrationForm: React.FC<FormProps> = ({ onSubmit, children }) => {
   return <SignUpForm onSubmit={onSubmit}>{children}</SignUpForm>;
 };
 
-// 3. 필드 그룹
+// 3. 필드 그룹 (생략 없음)
 interface FieldGroupProps {
   label: string;
   children: ReactNode;
@@ -71,7 +72,7 @@ const FieldGroup: React.FC<FieldGroupProps> = ({
   );
 };
 
-// 4. 약관 동의 섹션
+// 4. 약관 동의 섹션 (생략 없음)
 const TermsSection: React.FC = () => (
   <TermsContainer>
     <AgreeAllRow>
@@ -102,14 +103,29 @@ const TermsSection: React.FC = () => (
 );
 
 // 5. 버튼 액션 그룹
+// 🌟 ActionProps 인터페이스 수정
 interface ActionProps {
   onRegister: () => void;
   onCancel: () => void;
+  // 💡 SignUpPage.tsx에서 전달하는 속성을 추가합니다.
+  registerText: string;
+  registerDisabled: boolean;
 }
-const ActionGroup: React.FC<ActionProps> = ({ onRegister, onCancel }) => (
+
+// 🌟 ActionGroup 컴포넌트 수정
+const ActionGroup: React.FC<ActionProps> = ({
+  onRegister,
+  onCancel,
+  registerText, // 추가
+  registerDisabled, // 추가
+}) => (
   <ActionRow>
-    <SubmitButton type="button" onClick={onRegister}>
-      会員登録
+    <SubmitButton
+      type="button"
+      onClick={onRegister}
+      disabled={registerDisabled} // 비활성화 속성 적용
+    >
+      {registerText} {/* 텍스트 속성 적용 */}
     </SubmitButton>
     <CancelButton type="button" onClick={onCancel}>
       キャンセル
@@ -117,7 +133,7 @@ const ActionGroup: React.FC<ActionProps> = ({ onRegister, onCancel }) => (
   </ActionRow>
 );
 
-// --- Compound Component 연결 ---
+// --- Compound Component 연결 (생략 없음) ---
 
 export const SignUp = Object.assign(SignUpComponentBase, {
   Form: RegistrationForm,
