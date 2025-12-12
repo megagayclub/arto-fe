@@ -170,7 +170,7 @@ const SignUpPage: React.FC = () => {
           registerText={isLoading ? "登録中..." : "登録"} 
           onRegister={executeSignUp} 
           onCancel={handleCancel}
-          registerDisabled={isLoading} // 로딩 중 버튼 비활성화
+          registerDisabled={isLoading}
         />
       </SignUp.Form>
     </SignUp>

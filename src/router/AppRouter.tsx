@@ -1,7 +1,8 @@
-// src/router/AppRouter.tsx (예시)
+// src/router/AppRouter.tsx
 
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Header from "../components/layout/Header/Header"; // 🌟 Header import
 
 // 인증 페이지
 import LoginPage from '../pages/LoginPage';
@@ -9,40 +10,37 @@ import SignUpPage from '../pages/SignUpPage';
 // import ForgotPasswordPage from '../pages/ForgotPasswordPage';
 
 // 메인 및 작품 페이지
-import MainPageLayout from '../pages/MainPageLayout';
+// import MainPageLayout from '../pages/MainPageLayout'; // 주석 해제 (MainPageLayout을 메인 페이지로 사용)
 import ProductDetailPage from '../pages/ProductDetailPage';
-import MarketLayout from '../pages/MarketLayout';
+import MarketPlacePage from '../pages/MarketPlacePage';
 
 // 마이페이지 및 주문
-import MyPageLayout from '../pages/MyPage';
-import CheckoutPage from '../pages/CheckoutPage';
-
-// 레이아웃 컴포넌트 (Header, Footer를 포함하는 공통 레이아웃)
-// import Layout from '../components/layout/Layout'; 
+import MyPage from '../pages/MyPage';
 
 
 const AppRouter: React.FC = () => {
     return (
         <BrowserRouter>
-            {/* 만약 Header와 Footer가 모든 페이지에 공통적으로 적용된다면 <Layout> 컴포넌트로 감쌉니다. */}
+            {/* Header는 모든 페이지 위에 고정됩니다. */}
+            <Header /> 
+            
             {/* <Layout> */}
                 <Routes>
                     
-                    {/* 메인 페이지 */}
-                    <Route path="/" element={<MainPageLayout />} />
+                    {/* 메인 페이지 (경로를 "/"로 지정해야 합니다.) */}
+                    <Route path="/" element={<div>메인 페이지 (MainPageLayout)</div>} /> 
                     
                     {/* 인증 경로 */}
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<SignUpPage />} />
-                    {/* <Route path="/forgot-password" element={<ForgotPasswordPage />} /> */}
                     
                     {/* 작품 및 마켓 */}
-                    <Route path="/market" element={<MarketLayout />} />
+                    <Route path="/market" element={<MarketPlacePage />} />
                     <Route path="/product/:id" element={<ProductDetailPage />} /> 
                     
                     {/* 마이페이지 및 주문 */}
-                    <Route path="/mypage" element={<MyPageLayout />} />
-                    <Route path="/checkout" element={<CheckoutPage />} />
+                    {/* <Route path="/mypage" element={<MyPage />} />
+                    <Route path="/checkout" element={<CheckoutPage />} /> */}
                     
                     {/* 404 페이지 */}
                     <Route path="*" element={<div>404 Not Found</div>} />
@@ -51,6 +49,6 @@ const AppRouter: React.FC = () => {
             {/* </Layout> */}
         </BrowserRouter>
     );
-);
+};
 
 export default AppRouter;

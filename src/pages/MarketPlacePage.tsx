@@ -3,7 +3,7 @@ import Header from "../components/layout/Header/Header";
 import { MarketLayout } from "../components/MarketPlace/MarketLayout";
 import { FilterSidebar } from "../components/layout/Filter/FilterSideBar";
 
-export const MarketPlacePage: React.FC = () => {
+const MarketPlacePage: React.FC = () => {
   return (
     <>
       <Header />
@@ -16,3 +16,5 @@ export const MarketPlacePage: React.FC = () => {
     </>
   );
 };
+
+export default MarketPlacePage;
