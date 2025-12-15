@@ -9,6 +9,9 @@ import { MyPage } from "./MyPage";
 // 🔹 찜 목록 API 훅
 import { useMyWishlist } from "../../hooks/useMyWishlist";
 
+// 🔹 장바구니 API 훅
+import { useMyCart } from "../../hooks/useMyCart";
+
 // 이 페이지의 전체 콘텐츠 영역에 패딩 등을 줄 수 있습니다.
 const PageWrapper = styled.div`
   padding: 20px 0;
@@ -16,43 +19,7 @@ const PageWrapper = styled.div`
   background-color: #fff;
 `;
 
-// 이미지에서 본 장바구니/구매 이력 등에 대한 더미 콘텐츠를 위한 컴포넌트
-const CartContent: React.FC = () => (
-  <>
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        padding: "10px 0",
-        borderBottom: "1px solid #ddd",
-      }}
-    >
-      <label>
-        <input type="checkbox" defaultChecked />
-        <span>전체 선택</span>
-      </label>
-      <span>선택 항목 삭제</span>
-    </div>
-
-    {/* 장바구니 상품 1 (작품: 미지의 섬) */}
-    <MyPage.Product
-      id={3}
-      title="미지의 섬"
-      date="2023년 10월 25일"
-      price={270000}
-      image=""
-    />
-    {/* 장바구니 상품 2 (작품: 산의 오후) */}
-    <MyPage.Product
-      id={4}
-      title="산의 오후"
-      date="2023년 7월 30일"
-      price={520000}
-      image=""
-    />
-  </>
-);
-
+// (더미) 구매 이력
 const PurchaseHistoryContent: React.FC = () => (
   <div style={{ textAlign: "center", padding: "30px 0", color: "#999" }}>
     <p>구매 이력이 없습니다.</p>
@@ -62,6 +29,7 @@ const PurchaseHistoryContent: React.FC = () => (
   </div>
 );
 
+// (더미) 문의 이력
 const InquiryContent: React.FC = () => (
   <div style={{ textAlign: "center", padding: "30px 0", color: "#999" }}>
     <p>문의 이력이 없습니다.</p>
@@ -72,8 +40,15 @@ const InquiryContent: React.FC = () => (
 );
 
 export const MyPageLayout: React.FC = () => {
-  // ✅ 여기서 찜 목록 API 호출
+  // ✅ 찜 목록 API 호출
   const { wishlist, isLoading, error } = useMyWishlist();
+
+  // ✅ 핵심: wishlist가 배열이 아닐 수도 있으니 무조건 배열로 안전 처리
+  const wishlistItems = Array.isArray(wishlist) ? wishlist : [];
+
+  // ✅ 장바구니 API 호출
+  const { cart, isLoading: cartLoading, error: cartError } = useMyCart();
+  const cartItems = cart?.items ?? [];
 
   return (
     <PageWrapper>
@@ -87,8 +62,8 @@ export const MyPageLayout: React.FC = () => {
           {/* 2-1. 주문 상태 요약 */}
           <MyPage.Order />
 
-          {/* 2-2. ✅ 찜 목록 섹션 - 이제 진짜 데이터 사용 */}
-          <MyPage.Section title={`찜 목록 (${wishlist.length})`}>
+          {/* 2-2. ✅ 찜 목록 섹션 */}
+          <MyPage.Section title={`찜 목록 (${wishlistItems.length})`}>
             {isLoading && <p>찜 목록 불러오는 중...</p>}
 
             {error && (
@@ -97,27 +72,60 @@ export const MyPageLayout: React.FC = () => {
               </p>
             )}
 
-            {!isLoading && !error && wishlist.length === 0 && (
+            {!isLoading && !error && wishlistItems.length === 0 && (
               <p style={{ fontSize: "14px", color: "#999" }}>
                 찜한 작품이 없습니다.
               </p>
             )}
 
-            {wishlist.map((item) => (
-              <MyPage.Product
-                key={item.wishlistId}
-                id={item.artworkId}
-                title={item.title}
-                date={new Date(item.addedAt).toLocaleDateString()}
-                price={item.price}
-                image={item.thumbnailImageUrl}
-              />
-            ))}
+            {!isLoading &&
+              !error &&
+              wishlistItems.map((item) => (
+                <MyPage.Product
+                  key={item.wishlistId}
+                  id={item.artworkId}
+                  title={item.title}
+                  date={new Date(item.addedAt).toLocaleDateString()}
+                  price={item.price}
+                  image={item.thumbnailImageUrl}
+                />
+              ))}
           </MyPage.Section>
 
-          {/* 2-3. 장바구니 섹션 (더미 그대로) */}
-          <MyPage.Section title="카트 (1)">
-            <CartContent />
+          {/* 2-3. ✅ 장바구니 섹션 */}
+          <MyPage.Section title={`카트 (${cartItems.length})`}>
+            {cartLoading && <p>장바구니 불러오는 중...</p>}
+
+            {cartError && (
+              <p style={{ color: "red" }}>
+                장바구니를 불러오는 중 오류가 발생했습니다: {cartError}
+              </p>
+            )}
+
+            {!cartLoading && !cartError && cartItems.length === 0 && (
+              <p style={{ fontSize: "14px", color: "#999" }}>
+                장바구니가 비어 있습니다.
+              </p>
+            )}
+
+            {!cartLoading &&
+              !cartError &&
+              cartItems.map((item) => (
+                <MyPage.Product
+                  key={item.cartItemId}
+                  id={item.artworkId}
+                  title={item.title}
+                  date={"-"} // ✅ CartResponse에 날짜 필드가 없어서 표시 불가
+                  price={Number(item.price)}
+                  image={item.thumbnailImageUrl}
+                />
+              ))}
+
+            {!cartLoading && !cartError && cart && (
+              <p style={{ marginTop: "12px", fontWeight: "bold" }}>
+                총액: {Number(cart.totalAmount).toLocaleString()}₩
+              </p>
+            )}
           </MyPage.Section>
 
           {/* 2-4. 구매 이력 섹션 (더미) */}
