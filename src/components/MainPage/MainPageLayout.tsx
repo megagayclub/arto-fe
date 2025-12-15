@@ -1,172 +1,159 @@
-import React, { useEffect, useRef } from "react";
-// 1. Install these packages:
-// npm install gsap locomotive-scroll
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import LocomotiveScroll from "locomotive-scroll";
+import React, { useEffect, useRef } from 'react';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import LocomotiveScroll from 'locomotive-scroll';
+import 'locomotive-scroll/dist/locomotive-scroll.css';
 
-// Register the GSAP ScrollTrigger plugin globally
+// 스타일 파일에서 Styled Components 임포트
+import { 
+  GlobalStyle, 
+  PageContainer, 
+  StyledSection, 
+  StyledSectionPin, 
+  PinWrap, 
+  StyledImage, 
+  StyledH1, 
+  StyledH2, 
+  StyledP, 
+  CreditH2 
+} from './MainPageLayoutStyles'; 
+
+// GSAP 플러그인 등록
 gsap.registerPlugin(ScrollTrigger);
 
-// Import your styles
-import "./HorizontalScrollLayout.css";
-// NOTE: You will need CSS for this to work properly, especially
-// to style the .pin-wrap to be wide enough for horizontal scrolling.
-
-const HorizontalScrollLayout = () => {
-  // Use a ref to target the main container for Locomotive Scroll initialization
-  const scrollContainerRef = useRef(null);
-
-  // Use a ref for the Locomotive Scroll instance
-  const scrollerInstance = useRef(null);
+const MainPageLayout: React.FC = () => {
+  const pageContainerRef = useRef<HTMLDivElement>(null);
+  const pinWrapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Ensure the container element is available
-    const pageContainer = scrollContainerRef.current;
-    if (!pageContainer) return;
+    const pageContainer = pageContainerRef.current;
+    const pinWrap = pinWrapRef.current;
+    let scroller: LocomotiveScroll | null = null;
 
-    // --- 1. INITIALIZE LOCOMOTIVE SCROLL ---
-    scrollerInstance.current = new LocomotiveScroll({
-      el: pageContainer,
-      smooth: true,
-      // You might need to add a class to the body/html to avoid layout shifts
-    });
-
-    const scroller = scrollerInstance.current;
-
-    // --- 2. CONNECT LOCOMOTIVE SCROLL TO SCROLLTRIGGER ---
-    scroller.on("scroll", ScrollTrigger.update);
-
-    ScrollTrigger.scrollerProxy(pageContainer, {
-      scrollTop(value) {
-        return arguments.length
-          ? scroller.scrollTo(value, 0, 0)
-          : scroller.scroll.instance.scroll.y;
-      },
-      getBoundingClientRect() {
-        return {
-          left: 0,
-          top: 0,
-          width: window.innerWidth,
-          height: window.innerHeight,
-        };
-      },
-      // You must use pinType: 'transform' when using Locomotive Scroll
-      pinType: pageContainer.style.transform ? "transform" : "fixed",
-    });
-
-    // --- 3. SETUP HORIZONTAL PINNING AND SCROLLING (ON WINDOW LOAD/COMPONENT MOUNT) ---
-    const setupHorizontalScroll = () => {
-      // Find the elements inside the pin-wrap. The total width of these
-      // determines the scroll distance.
-      const pinWrap = pageContainer.querySelector(".pin-wrap");
-
-      // Stop if the required element is missing
-      if (!pinWrap) return;
-
-      // We must calculate the total width of the elements inside the pin-wrap
-      // to determine how far to scroll.
-      const pinWrapWidth = pinWrap.offsetWidth;
-      const horizontalScrollLength = pinWrapWidth - window.innerWidth;
-
-      // Pinning and horizontal scrolling animation
-      gsap.to(pinWrap, {
-        scrollTrigger: {
-          scroller: pageContainer, // Tell ScrollTrigger to use the Locomotive Scroll scroller
-          scrub: true,
-          trigger: "#sectionPin",
-          pin: true,
-          start: "top top",
-          // The end point determines how long the pinning/horizontal scroll lasts
-          end: pinWrapWidth, // The vertical scroll distance is equal to the pin-wrap width
-        },
-        x: -horizontalScrollLength, // Move the pin-wrap container horizontally
-        ease: "none",
+    if (pageContainer && pinWrap) {
+      /* 1. Initialize Locomotive Scroll */
+      scroller = new LocomotiveScroll({
+        el: pageContainer,
+        smooth: true,
       });
 
-      // Update ScrollTrigger and Locomotive Scroll on refresh/resize
-      ScrollTrigger.addEventListener("refresh", () => scroller.update());
-      ScrollTrigger.refresh();
-    };
+      /* 2. ScrollTrigger Integration */
+      scroller.on('scroll', ScrollTrigger.update);
 
-    // Run the setup after a short delay to ensure DOM is fully painted
-    // or run it directly since it's inside useEffect which runs after mount.
-    setupHorizontalScroll();
+      ScrollTrigger.scrollerProxy(pageContainer, {
+        scrollTop(value) {
+          return arguments.length
+            ? scroller?.scrollTo(value, { duration: 0, disableLerp: true })
+            : scroller?.scroll.instance.scroll.y || 0;
+        },
+        getBoundingClientRect() {
+          return {
+            left: 0,
+            top: 0,
+            width: window.innerWidth,
+            height: window.innerHeight,
+          };
+        },
+        pinType: pageContainer.style.transform ? 'transform' : 'fixed',
+      });
 
-    // --- 4. CLEANUP FUNCTION ---
-    // Destroy instances and remove event listeners when the component unmounts
+      /* 3. Horizontal Scroll Logic */
+      const setupHorizontalScroll = () => {
+        let pinWrapWidth = pinWrap.scrollWidth; 
+        let horizontalScrollLength = pinWrapWidth - window.innerWidth;
+
+        if (horizontalScrollLength < 0) horizontalScrollLength = 0;
+
+        gsap.to(pinWrap, {
+          scrollTrigger: {
+            scroller: pageContainer,
+            scrub: true,
+            trigger: '#sectionPin',
+            pin: true,
+            start: 'top top',
+            end: `+=${horizontalScrollLength}`, 
+          },
+          x: -horizontalScrollLength,
+          ease: 'none',
+        });
+
+        ScrollTrigger.addEventListener('refresh', () => scroller?.update());
+        ScrollTrigger.refresh();
+      };
+
+      setupHorizontalScroll();
+    }
+
+    /* 4. Cleanup Function */
     return () => {
-      if (scroller) {
-        scroller.destroy();
-      }
-      ScrollTrigger.getAll().forEach((t) => t.kill());
-      ScrollTrigger.removeEventListener("refresh", () => scroller.update());
+      ScrollTrigger.getAll().forEach(t => t.kill());
+      ScrollTrigger.scrollerProxy(pageContainer, undefined);
+      scroller?.destroy();
+      scroller = null;
     };
-  }, []); // Empty dependency array ensures this runs once on mount
+  }, []); 
 
   return (
-    // The main container for Locomotive Scroll
-    <div className="container" data-scroll-container ref={scrollContainerRef}>
-      {/* First Section */}
-      <section
-        data-bgcolor="#bcb8ad"
-        data-textcolor="#032f35"
-        data-scroll-section
-      >
-        <div data-scroll>
-          <h1 data-scroll data-scroll-speed="1">
-            <span>Horizontal</span> <span>scroll</span> <span>section</span>
-          </h1>
-          <p data-scroll data-scroll-speed="2" data-scroll-delay="0.2">
-            with GSAP ScrollTrigger & Locomotive Scroll
-          </p>
-        </div>
-      </section>
+    <>
+      <GlobalStyle />
+      <PageContainer ref={pageContainerRef}>
+        {/* Section 1 */}
+        <StyledSection 
+          data-bgcolor="#bcb8ad" 
+          data-textcolor="#032f35" 
+          style={{ '--bg-color': '#bcb8ad', '--text-color': '#032f35' } as React.CSSProperties}
+        >
+          <div>
+            <StyledH1 data-scroll data-scroll-speed="1">
+              <span>Arto</span> 
+            </StyledH1>
+            <StyledP data-scroll data-scroll-speed="2" data-scroll-delay="0.2">
+              with GSAP ScrollTrigger & Locomotive Scroll
+            </StyledP>
+          </div>
+        </StyledSection>
 
-      {/* Second Section: Horizontal Scroll/Pinning Container */}
-      <section id="sectionPin" data-scroll-section>
-        <div className="pin-wrap">
-          <h2>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua.
-          </h2>
-          <img
-            src="https://images.pexels.com/photos/5207262/pexels-photo-5207262.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=900"
-            alt="Abstract view of mountains"
-          />
-          <img
-            src="https://images.pexels.com/photos/3371358/pexels-photo-3371358.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=900"
-            alt="Person standing on rock face"
-          />
-          <img
-            src="https://images.pexels.com/photos/3618545/pexels-photo-3618545.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=900"
-            alt="Coastal landscape with waves"
-          />
-        </div>
-      </section>
+        {/* Section 2: Horizontal Pinning Section */}
+        <StyledSectionPin>
+          <PinWrap ref={pinWrapRef}>
+            <StyledH2>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            </StyledH2>
+            <StyledImage
+              src="https://images.pexels.com/photos/5207262/pexels-photo-5207262.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=900"
+              alt="First Image"
+            />
+            <StyledImage
+              src="https://images.pexels.com/photos/3371358/pexels-photo-3371358.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=900"
+              alt="Second Image"
+            />
+            <StyledImage
+              src="https://images.pexels.com/photos/3618545/pexels-photo-3618545.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=900"
+              alt="Third Image"
+            />
+          </PinWrap>
+        </StyledSectionPin>
 
-      {/* Third Section */}
-      <section
-        data-bgcolor="#e3857a"
-        data-textcolor="#f1dba7"
-        data-scroll-section
-      >
-        <img
-          src="https://images.pexels.com/photos/4791474/pexels-photo-4791474.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
-          alt="Abstract pattern of colors"
-        />
-        <h2 data-scroll data-scroll-speed="1" className="credit">
-          <a
-            href="https://thisisadvantage.com"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Made by Advantage
-          </a>
-        </h2>
-      </section>
-    </div>
+        {/* Section 3 */}
+        <StyledSection 
+          data-bgcolor="#e3857a" 
+          data-textcolor="#f1dba7" 
+          style={{ '--bg-color': '#e3857a', '--text-color': '#f1dba7' } as React.CSSProperties}
+        >
+          <StyledImage
+            src="https://images.pexels.com/photos/4791474/pexels-photo-4791474.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
+            alt="Last Image"
+          />
+          <CreditH2 data-scroll data-scroll-speed="1">
+            <a href="https://thisisadvantage.com" target="_blank" rel="noopener noreferrer">
+              Made by Advantage
+            </a>
+          </CreditH2>
+        </StyledSection>
+      </PageContainer>
+    </>
   );
 };
 
-export default HorizontalScrollLayout;
+export default MainPageLayout;

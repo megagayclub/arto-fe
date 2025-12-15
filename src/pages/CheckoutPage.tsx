@@ -7,7 +7,7 @@ import {
   SectionTitle,
 } from "../components/Checkout/CheckoutStyles";
 
-export const CheckoutPage: React.FC = () => {
+const CheckoutPage: React.FC = () => {
   // 실제로는 여기서 useFetchUserOrders, useFetchCartItems 등의 훅을 사용해 데이터를 불러옵니다.
   const products = DUMMY_PRODUCTS;
   const summary = DUMMY_SUMMARY;
@@ -118,3 +118,5 @@ export const CheckoutPage: React.FC = () => {
     </>
   );
 };
+
+export default CheckoutPage;

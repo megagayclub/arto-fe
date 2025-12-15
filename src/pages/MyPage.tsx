@@ -3,7 +3,7 @@ import Header from "../components/layout/Header/Header";
 import { MyPageLayout } from "../components/MyPage/MyPageLayout";
 // import { FilterSidebar } from "./../components/layout/Filter/FilterSideBar";
 
-export const MyPage: React.FC = () => {
+const MyPage: React.FC = () => {
   return (
     <>
       <Header />
@@ -11,3 +11,5 @@ export const MyPage: React.FC = () => {
     </>
   );
 };
+
+export default MyPage;

@@ -68,6 +68,7 @@ interface ActionButtonProps {
   type?: "submit" | "button";
   isPrimary?: boolean; // 로그인 버튼과 회원가입 버튼을 구분
   href?: string; // 링크인 경우
+  disabled?: boolean;
 }
 
 const Action: React.FC<ActionButtonProps> = ({
@@ -107,49 +108,3 @@ export const Login = Object.assign(LoginComponentBase, {
   RememberMe: RememberMe,
   Action: Action,
 });
-
-// --- 최종 사용 예시 ---
-
-/*
-const LoginPage: React.FC = () => {
-    const handleSubmit = (e: FormEvent) => {
-        e.preventDefault();
-        console.log('로그인 시도');
-    };
-    
-    return (
-        <Login.Layout>
-            <Login.Form onSubmit={handleSubmit}>
-                
-                <Login.Input 
-                    type="email" 
-                    placeholder="ID(E-mail)" 
-                    required 
-                />
-                <Login.Input 
-                    type="password" 
-                    placeholder="Password" 
-                    required 
-                />
-
-                <Login.RememberMe />
-
-                <Login.Action type="submit" isPrimary>
-                    로그인
-                </Login.Action>
-                
-                <Login.Action type="button" onClick={() => console.log('회원가입 페이지 이동')}>
-                    회원 등록
-                </Login.Action>
-
-                <Login.Action href="/forgot-password">
-                    パスワードの再発行 (비밀번호 찾기)
-                </Login.Action>
-
-            </Login.Form>
-        </Login.Layout>
-    );
-};
-
-export default LoginPage;
-*/
