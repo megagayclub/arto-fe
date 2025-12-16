@@ -4,7 +4,7 @@ import axios from 'axios';
 
 // 백엔드 API의 기본 URL을 설정합니다.
 // 개발 환경에 맞게 수정하세요. (예: http://localhost:8080)
-const BASE_URL = 'http://localhost:8080/api/v1/';;
+const BASE_URL = 'http://arto-server:8080/api/v1/';;
 
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
