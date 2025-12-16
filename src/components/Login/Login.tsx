@@ -68,6 +68,7 @@ interface ActionButtonProps {
   type?: "submit" | "button";
   isPrimary?: boolean; // 로그인 버튼과 회원가입 버튼을 구분
   href?: string; // 링크인 경우
+  disabled?: boolean;
 }
 
 const Action: React.FC<ActionButtonProps> = ({
