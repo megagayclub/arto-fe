@@ -15,7 +15,6 @@ COPY src ./src
 COPY public ./public
 COPY index.html ./
 COPY tsconfig.json ./
-COPY tsconfig.node.json ./
 COPY vite.config.ts ./
 
 # 4. 빌드 (여기서 tsc 에러가 나면 package.json에서 "build": "vite build"로 수정)
