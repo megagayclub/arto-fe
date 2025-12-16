@@ -2,221 +2,224 @@ import React, { useState, useRef, useEffect } from "react";
 import styled, { css } from "styled-components";
 import { HiHomeModern } from "react-icons/hi2";
 import {
-  MAIN_FILTER_ICONS,
-  SPACE_OPTIONS,
-  MOOD_OPTIONS,
-  COLOR_OPTIONS,
-  ETC_OPTIONS,
-  SHAPE_OPTIONS,
+  MAIN_FILTER_ICONS,
+  SPACE_OPTIONS,
+  MOOD_OPTIONS,
+  COLOR_OPTIONS,
+  ETC_OPTIONS,
+  SHAPE_OPTIONS,
 } from "../../data/FilterData";
+// 🌟 [수정] useArtworkSearch 대신 MarketContext에서 데이터를 가져옵니다.
+import { useMarket } from "../../../context/MarketContext"; // 정확한 경로 (FilterSidebar.tsx -> src/context/)
 
 // --- 필터 상태 타입 및 초기값 정의 ---
 interface FilterStateType {
-  space: string;
-  mood: string;
-  minPrice: number;
-  maxPrice: number;
-  selectedColor: string;
-  etc: string[];
+  space: string;
+  mood: string;
+  minPrice: number;
+  maxPrice: number;
+  selectedColor: string;
+  etc: string[];
 }
 
 const initialFilters: FilterStateType = {
-  space: "거실",
-  mood: "모던",
-  minPrice: 0,
-  maxPrice: 1000000,
-  selectedColor: "#FF0000",
-  etc: [],
+  space: "거실",
+  mood: "모던",
+  minPrice: 0,
+  maxPrice: 1000000,
+  selectedColor: "#FF0000",
+  etc: [],
 };
 
 // --- A. 스타일 정의 ---
+// (스타일 코드는 변경 없이 그대로 유지됩니다.)
 
 // 🌟 수정: 패널 열림/닫힘 상태를 받아 translateX로 이동
 const SidebarWrapper = styled.div<{ $isPanelOpen: boolean }>`
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  z-index: 100;
-  display: flex;
-  width: ${(props) => (props.$isPanelOpen ? "980px" : "80px")};
-  // 패널 닫혔을 때 너비만 남기고, 포인터 이벤트를 IconNav에만 허용
-  transition: width 0.3s ease-in-out;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  z-index: 100;
+  display: flex;
+  width: ${(props) => (props.$isPanelOpen ? "980px" : "80px")};
+  // 패널 닫혔을 때 너비만 남기고, 포인터 이벤트를 IconNav에만 허용
+  transition: width 0.3s ease-in-out;
 `;
 
 const IconNav = styled.div`
-  position: fixed;
-  height: 100vh;
-  width: 80px;
-  background-color: #1a1a1a;
-  color: #fff;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-top: 100px;
-  z-index: 110;
+  position: fixed;
+  height: 100vh;
+  width: 80px;
+  background-color: #1a1a1a;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 100px;
+  z-index: 110;
 `;
 
 const IconItem = styled.div<{ $isActive?: boolean }>`
-  width: 100%;
-  height: 50px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  font-size: 20px;
-  transition: background-color 0.2s;
+  width: 100%;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-size: 20px;
+  transition: background-color 0.2s;
 
-  ${(props) =>
-    props.$isActive &&
-    css`
-      background-color: #fff;
-      color: #1a1a1a;
-    `}
+  ${(props) =>
+    props.$isActive &&
+    css`
+      background-color: #fff;
+      color: #1a1a1a;
+    `}
 
-  ${(props) =>
-    !props.$isActive &&
-    css`
-      &:hover {
-        background-color: #333;
-      }
-    `}
+  ${(props) =>
+    !props.$isActive &&
+    css`
+      &:hover {
+        background-color: #333;
+      }
+    `}
 `;
 
 // 🌟 FilterPanel: 고정 너비와 세로 스크롤 허용
 const FilterPanel = styled.div<{ $isPanelOpen: boolean }>`
-  position: fixed;
-  left: 80px;
-  width: 900px;
-  background-color: #f7f7f7;
-  overflow-y: auto;
-  padding: 40px;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding-top: 100px;
-  transform: translateX(${(props) => (props.$isPanelOpen ? "0" : "-980px")});
-  transition: transform 0.3s ease-in-out;
-  pointer-events: ${(props) => (props.$isPanelOpen ? "auto" : "none")};
+  position: fixed;
+  left: 80px;
+  width: 900px;
+  background-color: #f7f7f7;
+  overflow-y: auto;
+  padding: 40px;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-top: 100px;
+  transform: translateX(${(props) => (props.$isPanelOpen ? "0" : "-980px")});
+  transition: transform 0.3s ease-in-out;
+  pointer-events: ${(props) => (props.$isPanelOpen ? "auto" : "none")};
 `;
 
 const CloseButton = styled.button`
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  color: #333;
-  width: 40px;
-  height: 40px;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #333;
+  width: 40px;
+  height: 40px;
 `;
 
 // 🌟 필터 섹션 컨테이너: 활성 상태에 따라 강조
 const FilterSection = styled.section<{ $isCurrent: boolean }>`
-  padding-bottom: 25px;
-  margin-bottom: 25px;
-  border-bottom: 1px solid #ddd;
-  transition: background-color 0.3s;
+  padding-bottom: 25px;
+  margin-bottom: 25px;
+  border-bottom: 1px solid #ddd;
+  transition: background-color 0.3s;
 
-  background-color: ${(props) =>
-    props.$isCurrent ? "#f0f0f0" : "transparent"};
-  padding: 10px;
-  margin: -10px;
-  margin-bottom: 15px;
-  border-radius: 5px;
+  background-color: ${(props) =>
+    props.$isCurrent ? "#f0f0f0" : "transparent"};
+  padding: 10px;
+  margin: -10px;
+  margin-bottom: 15px;
+  border-radius: 5px;
 `;
 
 const FilterSectionTitle = styled.h4`
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 15px;
-  color: #333;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #333;
 `;
 
 const OptionList = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 `;
 
 const OptionButton = styled.button<{ $isActive: boolean }>`
-  padding: 8px 15px;
-  border: 1px solid ${(props) => (props.$isActive ? "#333" : "#ccc")};
-  background-color: ${(props) => (props.$isActive ? "#333" : "#fff")};
-  color: ${(props) => (props.$isActive ? "#fff" : "#333")};
-  border-radius: 20px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s;
+  padding: 8px 15px;
+  border: 1px solid ${(props) => (props.$isActive ? "#333" : "#ccc")};
+  background-color: ${(props) => (props.$isActive ? "#333" : "#fff")};
+  color: ${(props) => (props.$isActive ? "#fff" : "#333")};
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
 `;
 
 const ColorOption = styled.div<{ hex: string; $isSelected: boolean }>`
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background-color: ${(props) => props.hex};
-  border: 2px solid ${(props) => (props.$isSelected ? "#333" : "#fff")};
-  box-shadow: 0 0 0 2px
-    ${(props) => (props.$isSelected ? "#333" : "transparent")};
-  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: ${(props) => props.hex};
+  border: 2px solid ${(props) => (props.$isSelected ? "#333" : "#fff")};
+  box-shadow: 0 0 0 2px
+    ${(props) => (props.$isSelected ? "#333" : "transparent")};
+  cursor: pointer;
 `;
 
 const RangeContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
 `;
 
 const RangeInput = styled.input.attrs({ type: "range" })`
-  width: 100%;
+  width: 100%;
 `;
 
 const InputGroup = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
 `;
 
 const PriceInput = styled.input.attrs({ type: "number" })`
-  width: 80px;
-  padding: 5px;
-  border: 1px solid #ccc;
-  text-align: center;
+  width: 80px;
+  padding: 5px;
+  border: 1px solid #ccc;
+  text-align: center;
 `;
 
 const ShapeOptionList = styled(OptionList)`
-  gap: 20px;
+  gap: 20px;
 `;
 
 const FooterButtons = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  gap: 15px;
-  padding-top: 20px;
-  border-top: 1px solid #ddd;
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  padding-top: 20px;
+  border-top: 1px solid #ddd;
 `;
 
 const ResetButton = styled.button`
-  padding: 12px 25px;
-  background-color: #fff;
-  border: 1px solid #333;
-  color: #333;
-  font-size: 16px;
-  cursor: pointer;
+  padding: 12px 25px;
+  background-color: #fff;
+  border: 1px solid #333;
+  color: #333;
+  font-size: 16px;
+  cursor: pointer;
 `;
 
 const SearchButton = styled.button`
-  padding: 12px 25px;
-  background-color: #333;
-  border: none;
-  color: #fff;
-  font-size: 16px;
-  cursor: pointer;
+  padding: 12px 25px;
+  background-color: #333;
+  border: none;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
 `;
 
 // --- B. 컴포넌트 구현 ---
@@ -225,6 +228,10 @@ export const FilterSidebar: React.FC = () => {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [activeIcon, setActiveIcon] = useState<string | null>("home");
   const [filters, setFilters] = useState<FilterStateType>(initialFilters);
+  
+  // 🌟 [수정] useArtworkSearch 대신 useMarket 훅을 사용하여 상태와 함수를 가져옵니다.
+  // 이 훅은 MarketContext.tsx에 정의되어 있습니다.
+  const { isLoading, executeSearch } = useMarket(); 
 
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
   const panelRef = useRef<HTMLDivElement>(null);
@@ -268,6 +275,19 @@ export const FilterSidebar: React.FC = () => {
   const handleClose = () => {
     setIsPanelOpen(false);
   };
+  
+  // 🌟 [추가] 검색 실행 로직
+  const handleSearch = () => {
+    // 1. 패널 닫기 (UX 개선)
+    handleClose(); 
+    
+    // 2. 검색 실행 (MarketContext의 executeSearch 호출)
+    executeSearch(filters); 
+    
+    // 3. (옵션) 콘솔에 필터 값 출력 (확인용)
+    console.log("검색 필터 적용:", filters);
+  }
+
 
   // 스크롤 이벤트 감지하여 활성 아이콘 업데이트 로직 (유지)
   useEffect(() => {
@@ -503,13 +523,18 @@ export const FilterSidebar: React.FC = () => {
             </OptionList>
           </FilterSection>
         </div>
+      
 
         <FooterButtons>
           <ResetButton onClick={() => handleIconClick("reset")}>
             초기화
           </ResetButton>
-          <SearchButton>적용</SearchButton>
+          <SearchButton onClick={handleSearch} disabled={isLoading}>
+            {isLoading ? "검색 중..." : "적용"} 
+          </SearchButton>
         </FooterButtons>
+
+        
       </FilterPanel>
     </SidebarWrapper>
   );
