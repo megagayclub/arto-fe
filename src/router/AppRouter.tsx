@@ -39,8 +39,8 @@ const AppRouter: React.FC = () => {
                     <Route path="/product/:id" element={<ProductDetailPage />} /> 
                     
                     {/* 마이페이지 및 주문 */}
-                    {/* <Route path="/mypage" element={<MyPage />} />
-                    <Route path="/checkout" element={<CheckoutPage />} /> */}
+                    <Route path="/mypage" element={<MyPage />} />
+                    {/* <Route path="/checkout" element={<CheckoutPage />} /> */}
                     
                     {/* 404 페이지 */}
                     <Route path="*" element={<div>404 Not Found</div>} />
