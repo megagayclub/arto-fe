@@ -29,7 +29,7 @@ export const useMyCart = () => {
         setIsLoading(true);
         setError(null);
 
-        const res = await axiosInstance.get<CartResponse>("/api/v1/cart");
+        const res = await axiosInstance.get<CartResponse>("/v1/cart");
 
         const safeCart: CartResponse = {
           ...res.data,
