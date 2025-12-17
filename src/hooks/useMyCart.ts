@@ -1,6 +1,6 @@
 // src/hooks/useMyCart.ts
 import { useEffect, useState } from "react";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 
 export interface CartItem {
   cartItemId: number;
@@ -29,7 +29,7 @@ export const useMyCart = () => {
         setIsLoading(true);
         setError(null);
 
-        const res = await axios.get<CartResponse>("/api/v1/cart");
+        const res = await axiosInstance.get<CartResponse>("/api/v1/cart");
 
         const safeCart: CartResponse = {
           ...res.data,

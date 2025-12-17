@@ -1,6 +1,6 @@
 // src/hooks/useMyWishlist.ts
 import { useEffect, useState } from "react";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 
 export interface WishlistItem {
   wishlistId: number;
@@ -23,7 +23,7 @@ export const useMyWishlist = () => {
         setIsLoading(true);
         setError(null);
 
-        const res = await axios.get<WishlistItem[]>("/api/v1/wishlists");
+        const res = await axiosInstance.get<WishlistItem[]>("/v1/wishlists");
 
         setWishlist(res.data ?? []);
       } catch (e: any) {
