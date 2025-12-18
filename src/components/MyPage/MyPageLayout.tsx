@@ -12,6 +12,9 @@ import { useMyWishlist } from "../../hooks/useMyWishlist";
 // 🔹 장바구니 API 훅
 import { useMyCart } from "../../hooks/useMyCart";
 
+// 🔹 문의 내역 API 훅 ✅ 추가
+import { useMyInquiries } from "../../hooks/useMyInquiries";
+
 // 이 페이지의 전체 콘텐츠 영역에 패딩 등을 줄 수 있습니다.
 const PageWrapper = styled.div`
   padding: 20px 0;
@@ -29,15 +32,6 @@ const PurchaseHistoryContent: React.FC = () => (
   </div>
 );
 
-// (더미) 문의 이력
-const InquiryContent: React.FC = () => (
-  <div style={{ textAlign: "center", padding: "30px 0", color: "#999" }}>
-    <p>문의 이력이 없습니다.</p>
-    <p style={{ fontSize: "12px", marginTop: "10px" }}>
-      궁금한 점이 있다면 언제든지 1대1 문의를 이용하세요.
-    </p>
-  </div>
-);
 
 export const MyPageLayout: React.FC = () => {
   // ✅ 찜 목록 API 호출
@@ -49,6 +43,17 @@ export const MyPageLayout: React.FC = () => {
   // ✅ 장바구니 API 호출
   const { cart, isLoading: cartLoading, error: cartError } = useMyCart();
   const cartItems = cart?.items ?? [];
+
+
+
+  // ✅ 문의 내역 API 호출 (GET /api/v1/inquiries)
+  const {
+    inquiries,
+    isLoading: inquiryLoading,
+    error: inquiryError,
+  } = useMyInquiries();
+
+  const inquiryItems = Array.isArray(inquiries) ? inquiries : [];
 
   return (
     <PageWrapper>
@@ -133,9 +138,34 @@ export const MyPageLayout: React.FC = () => {
             <PurchaseHistoryContent />
           </MyPage.Section>
 
-          {/* 2-5. 문의사항 섹션 (더미) */}
-          <MyPage.Section title="문의사항">
-            <InquiryContent />
+          {/* 2-5. ✅ 문의사항 섹션 (API 연동) */}
+          <MyPage.Section title={`문의사항 (${inquiryItems.length})`}>
+            
+            {inquiryLoading && <p>문의 내역 불러오는 중...</p>}
+
+            {inquiryError && (
+              <p style={{ color: "red" }}>
+                문의 내역을 불러오는 중 오류가 발생했습니다: {inquiryError}
+              </p>
+            )}
+
+            {!inquiryLoading && !inquiryError && inquiryItems.length === 0 && (
+              <p style={{ fontSize: "14px", color: "#999" }}>
+                문의 이력이 없습니다.
+              </p>
+            )}
+
+            {!inquiryLoading &&
+              !inquiryError &&
+              inquiryItems.map((q) => (
+                <MyPage.Product
+                  key={q.inquiryId}
+                  id={q.inquiryId}
+                  title={q.title}
+                  date={new Date(q.createdAt).toLocaleDateString()}
+                  // ✅ 문의는 price/image 없음 (MyPage.Product가 optional 처리돼 있어야 함)
+                />
+              ))}
           </MyPage.Section>
         </MyPage.Content>
       </MyPage>
