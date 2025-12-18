@@ -2,7 +2,7 @@ name: CI/CD Docker
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 env:
   DOCKER_IMAGE: ghcr.io/${{ github.repository_owner }}/arto-fe-deploy
@@ -12,10 +12,10 @@ env:
 jobs:
   build:
     name: Build
-    runs-on: ubuntu-latest # 빌드는 깃허브 서버에서 안전하게 수행
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4 # 최신 버전으로 업데이트 (set-output 경고 해결)
-      
+      - uses: actions/checkout@v4
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -38,7 +38,7 @@ jobs:
   deploy:
     needs: build
     name: Deploy
-    runs-on: [ self-hosted, label-go ]
+    runs-on: [self-hosted, label-go]
     steps:
       - name: Login to GHCR
         uses: docker/login-action@v3
@@ -49,18 +49,18 @@ jobs:
 
       - name: Docker deploy
         run: |
-          # 기존 컨테이너가 없어도 에러 나지 않도록 수정
+          # 1. 기존 컨테이너 및 쓰레기 이미지 정리 (용량 확보 및 꼬임 방지)
           docker stop ${{ env.NAME }} 2>/dev/null || true
           docker rm ${{ env.NAME }} 2>/dev/null || true
-          
-          # 최신 이미지 가져오기
+          docker image prune -f
+
+          # 2. 최신 이미지 가져오기
           docker pull ${{ env.DOCKER_IMAGE }}:latest
-          
-          # Vite의 포트와 호스트 설정을 고려하여 실행 (81번 포트로 접속)
-          # 아까 로그에서 5173번이 떴으므로 내부 포트를 5173으로 맞추는 것이 안전합니다.
+
+          # 3. [중요] Nginx 기반으로 실행하므로 내부 포트를 80으로 연결
+          # 외부 81번 -> 컨테이너 80번
           docker run -d \
-            -i -t \
-            -p 81:3000 \
             --name ${{ env.NAME }} \
+            -p 81:80 \
             --restart always \
             ${{ env.DOCKER_IMAGE }}:latest
