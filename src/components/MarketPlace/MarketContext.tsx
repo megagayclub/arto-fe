@@ -8,6 +8,7 @@ interface Product {
   artistName: string;
   price: number;
   thumbnailImageUrl : string;
+  isWished: boolean;
 }
 
 // 2. 검색 조건 타입 (백엔드 ArtworkSearchCondition과 매핑)
@@ -33,6 +34,7 @@ interface MarketContextType {
   setFilters: React.Dispatch<React.SetStateAction<FilterStateType>>;
   applyFilters: (overrideFilters?: FilterStateType) => void;
   resetFilters: () => void;
+  setProducts: React.Dispatch<React.SetStateAction<Product[]>>;
 }
 
 const MarketContext = createContext<MarketContextType | undefined>(undefined);
@@ -133,7 +135,7 @@ const applyFilters = (overrideFilters?: FilterStateType) => {
   return (
     <MarketContext.Provider value={{ 
       products, isLoading, error, currentPage, totalPages, 
-      setCurrentPage, filters, setFilters, applyFilters, resetFilters 
+      setCurrentPage, filters, setFilters, applyFilters, resetFilters,setProducts
     }}>
       {children}
     </MarketContext.Provider>
