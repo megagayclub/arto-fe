@@ -1,6 +1,6 @@
 // src/hooks/useArtworkDetail.ts
 import { useEffect, useState } from "react";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 
 // ========================
 // 프론트에서 사용하는 타입
@@ -52,7 +52,7 @@ export const useArtworkDetail = (artworkId: number): UseArtworkDetailReturn => {
       setError(null);
 
       try {
-        const res = await axios.get(
+        const res = await axiosInstance.get(
           `${API_BASE_URL}/api/v1/artworks/${artworkId}`,
           {
             signal: controller.signal,
@@ -90,7 +90,13 @@ export const useArtworkDetail = (artworkId: number): UseArtworkDetailReturn => {
 
         setArtworkDetail(mapped);
       } catch (err: any) {
+        // ✅ abort로 취소된 요청은 정상 동작이므로 무시
+         if (err?.code === "ERR_CANCELED" || err?.name === "CanceledError") {
+    return;
+  }
+
         console.error("작품 상세 API 오류:", err);
+        
         const msg =
           err?.response?.data?.message ??
           err?.message ??

@@ -67,40 +67,22 @@ const SortButton = styled.button<{ $isSelected: boolean }>`
 
 // --- 컴포넌트 로직 수정 ---
 
+
 export const MarketFilter: React.FC = () => {
   const { filters, setFilters } = useMarket();
 
-  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setFilters((prev) => ({ ...prev, category: e.target.value }));
-  };
-
-  // 버튼 클릭 핸들러: 특정 value를 받아 sort 상태를 업데이트합니다.
   const handleSortClick = (sortValue: string) => {
+    // 버튼 클릭 시 filters.sort 상태를 업데이트 -> useEffect에 의해 자동으로 fetchProducts 실행
     setFilters((prev) => ({ ...prev, sort: sortValue }));
   };
 
   return (
     <FilterContainer>
-      {/* 1. Category (SelectBox 유지) */}
-      <div>
-        <label htmlFor="category">Category: </label>
-        <SelectBox
-          id="category"
-          value={filters.category}
-          onChange={handleCategoryChange}
-        >
-          <option value="All">All</option>
-          <option value="Painting">Painting</option>
-          <option value="Sculpture">Sculpture</option>
-        </SelectBox>
-      </div>
-
-      {/* 2. Sort By (버튼으로 변경) */}
+      <div /> {/* 왼쪽 공백 유지 */}
       <SortOptionsContainer>
         {SORT_OPTIONS.map((option) => (
           <SortButton
             key={option.value}
-            // 🌟 현재 Context의 filters.sort 값과 일치하면 true
             $isSelected={filters.sort === option.value}
             onClick={() => handleSortClick(option.value)}
           >

@@ -1,17 +1,22 @@
 // src/utils/axiosInstance.ts
-
-import axios from 'axios';
-
-// 백엔드 API의 기본 URL을 설정합니다.
-// 개발 환경에 맞게 수정하세요. (예: http://localhost:8080)
-const BASE_URL = 'http://arto-server:8080/api/v1/';;
+import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: BASE_URL,
+  // ✅ Vite proxy("/api" -> http://localhost:8080) 타게 하기
+  baseURL: "/api",
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
-  // 필요한 경우 withCredentials 등 추가 설정
+});
+
+// ✅ 요청마다 토큰 자동 첨부
+axiosInstance.interceptors.request.use((config) => {
+  const token = localStorage.getItem("accessToken");
+  if (token) {
+    config.headers = config.headers ?? {};
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 export default axiosInstance;

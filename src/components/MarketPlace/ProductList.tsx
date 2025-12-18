@@ -1,23 +1,11 @@
 import React from "react";
 import styled from "styled-components";
-import { useMarket } from "./MarketContext"; // MarketContext는 변경 없음
+import { useMarket } from "./MarketContext";
 
-// MarketContext에서 사용했던 Product 타입 (참조용)
-// interface Product {
-//   id: number;
-//   title: string;
-//   artist: string;
-//   price: number;
-//   image: string;
-// }
-
-// --- 스타일 수정 ---
+// --- 스타일 수정 (기존과 동일) ---
 
 const ListGrid = styled.div`
   display: flex;
-  /* flex-wrap: wrap; : 컨테이너 너비를 초과하면 다음 줄로 넘어갑니다.
-    align-items: stretch; : 이 속성이 ItemCard의 높이를 ListGrid에서 가장 높은 아이템의 높이에 맞게 늘려줍니다.
-  */
   flex-wrap: wrap;
   align-items: stretch;
   justify-content: center;
@@ -27,11 +15,10 @@ const ListGrid = styled.div`
 
 const ItemCard = styled.div`
   display: flex;
-  flex-direction: column; /* 세로 방향으로 쌓고 */
-  justify-content: space-between; /* 내용물이 위아래로 분산되게 할 수도 있지만, 여기서는 */
-  /* height: auto; 혹은 min-height를 사용하면 아이템 카드가 내용에 맞춰 늘어납니다. */
+  flex-direction: column;
+  justify-content: space-between;
   border: 1px solid #ddd;
-  flex: 0 0 calc(25% - 15px); /* 한 줄에 4개(25%)씩 배치하고 gap(20px)을 고려한 너비 */
+  flex: 0 0 calc(25% - 15px);
   max-width: 200px;
   padding: 15px;
   text-align: center;
@@ -50,7 +37,6 @@ const ItemCard = styled.div`
     margin-bottom: 10px;
   }
 
-  /* ... 나머지 스타일은 유지 ... */
   h3 {
     font-size: 1.1em;
     margin: 5px 0;
@@ -68,16 +54,15 @@ const ItemCard = styled.div`
     color: #a00;
     font-size: 1.2em;
     margin-top: 10px;
-    /* 가격이 항상 카드 하단에 붙도록 justify-content: space-between과 함께 사용하려면 margin-top을 없애야 하지만, 여기서는 간단히 margin-top만 유지합니다. */
   }
 `;
 
-// --- 컴포넌트 로직은 유지 ---
+// --- 컴포넌트 수정 ---
 
 // 개별 상품 아이템 컴포넌트
 const ProductItem: React.FC<{ product: any }> = ({ product }) => (
   <ItemCard>
-    <img src={product.image} alt={product.title} />
+    <img src={product.thumbnailImageUrl} alt={product.title} />
     <h3>{product.title}</h3>
     <p>Artist: {product.artist}</p>
     <strong>₩{product.price.toLocaleString()}</strong>
@@ -89,9 +74,13 @@ export const ProductList: React.FC = () => {
 
   return (
     <ListGrid>
-      {products.length > 0 ? (
-        products.map((product) => (
-          <ProductItem key={product.id} product={product} />
+      {products && products.length > 0 ? (
+        products.map((product, index) => (
+          /* 해결책: product.id가 확실히 고유한지 확인하세요. 
+             만약 API에서 중복된 ID를 준다면 `${product.id}-${index}` 처럼 조합할 수 있습니다.
+             하지만 가장 좋은 방법은 데이터 소스(MarketContext)의 id를 고유하게 만드는 것입니다.
+          */
+          <ProductItem key={product.id || index} product={product} />
         ))
       ) : (
         <p>No products found.</p>
