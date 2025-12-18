@@ -17,7 +17,7 @@ export const GlobalStyle = createGlobalStyle`
   }
   
   body {
-    font-family: termina, sans-serif;
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
     color: var(--text-color);
     background: var(--bg-color);
     transition: 0.3s ease-out;
@@ -25,6 +25,7 @@ export const GlobalStyle = createGlobalStyle`
     max-width: 100%;
     width: 100%;
     overscroll-behavior: none;
+    margin: 0px;
   }
 
   * {
@@ -41,7 +42,7 @@ export const PageContainer = styled.div.attrs({
 `;
 
 export const StyledSection = styled.section`
-  min-height: 100vh;
+  min-height: 101vh;
   width: 100%;
   position: relative;
   display: grid;
@@ -92,9 +93,12 @@ export const StyledH1 = styled.h1`
   position: absolute;
   top: 10vw;
   left: 10vw;
-  z-index: 4;
+  z-index: 10;
   overflow-wrap: break-word;
   hyphens: auto;
+  color: #fff;
+  background-color: #472cceff;
+  padding: 0.5rem 1rem; /* 상하 0.5rem, 좌우 1rem 여백 */
 
   @media (max-width: 768px) {
     font-size: 16vw;
@@ -114,8 +118,11 @@ export const StyledP = styled.p`
   position: absolute;
   bottom: 10vw;
   right: 10vw;
-  width: 200px;
+  width: 320px;
+  font-size: 1.5rem;
   line-height: 1.5;
+  font-weight: 700;
+  color: #130d27ff
 `;
 
 export const CreditH2 = styled(StyledH2).attrs({
