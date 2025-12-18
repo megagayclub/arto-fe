@@ -1,0 +1,35 @@
+"use strict";
+var __makeTemplateObject = (this && this.__makeTemplateObject) || function (cooked, raw) {
+    if (Object.defineProperty) { Object.defineProperty(cooked, "raw", { value: raw }); } else { cooked.raw = raw; }
+    return cooked;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+exports.__esModule = true;
+exports.CancelButton = exports.SubmitButton = exports.ActionRow = exports.TermLink = exports.TermItem = exports.AgreeAllRow = exports.TermsContainer = exports.CheckIcon = exports.PostcodeButton = exports.InputBlock = exports.InputWrapper = exports.InputGroup = exports.InputGrid = exports.SignUpForm = exports.SignUpTitle = exports.SignUpFormContainer = exports.PageWrapper = void 0;
+// src/components/SignUp/SignUpStyles.ts
+var styled_components_1 = __importDefault(require("styled-components"));
+var LoginStyles_1 = require("../Login/LoginStyles"); // 기존 로그인 스타일 재사용
+// --- 기본 레이아웃 및 폼 ---
+exports.PageWrapper = styled_components_1["default"].div(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n  min-height: calc(100vh - 100px);\n  display: flex;\n  justify-content: center;\n  padding: 50px 20px;\n  background-color: #fff;\n  font-family: Arial, sans-serif;\n"], ["\n  min-height: calc(100vh - 100px);\n  display: flex;\n  justify-content: center;\n  padding: 50px 20px;\n  background-color: #fff;\n  font-family: Arial, sans-serif;\n"])));
+exports.SignUpFormContainer = (0, styled_components_1["default"])(LoginStyles_1.FormContainer)(templateObject_2 || (templateObject_2 = __makeTemplateObject(["\n  max-width: 800px;\n  text-align: left;\n"], ["\n  max-width: 800px;\n  text-align: left;\n"])));
+exports.SignUpTitle = (0, styled_components_1["default"])(LoginStyles_1.Title)(templateObject_3 || (templateObject_3 = __makeTemplateObject(["\n  text-align: left;\n  margin-bottom: 30px;\n  font-size: 26px;\n  font-weight: 500;\n  border-bottom: 2px solid #333;\n  padding-bottom: 15px;\n"], ["\n  text-align: left;\n  margin-bottom: 30px;\n  font-size: 26px;\n  font-weight: 500;\n  border-bottom: 2px solid #333;\n  padding-bottom: 15px;\n"])));
+exports.SignUpForm = (0, styled_components_1["default"])(LoginStyles_1.Form)(templateObject_4 || (templateObject_4 = __makeTemplateObject(["\n  gap: 20px;\n"], ["\n  gap: 20px;\n"])));
+// --- 입력 필드 확장 (2단 그리드) ---
+exports.InputGrid = styled_components_1["default"].div(templateObject_5 || (templateObject_5 = __makeTemplateObject(["\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  gap: 20px;\n  margin-bottom: 20px;\n"], ["\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  gap: 20px;\n  margin-bottom: 20px;\n"])));
+exports.InputGroup = styled_components_1["default"].div(templateObject_6 || (templateObject_6 = __makeTemplateObject(["\n  display: flex;\n  flex-direction: column;\n  gap: 8px;\n\n  /* \uCCB4\uD06C \uC544\uC774\uCF58\uC744 \uC704\uD55C \uACF5\uAC04 */\n  label {\n    display: flex;\n    align-items: center;\n    font-size: 14px;\n    color: #333;\n    font-weight: bold;\n  }\n"], ["\n  display: flex;\n  flex-direction: column;\n  gap: 8px;\n\n  /* \uCCB4\uD06C \uC544\uC774\uCF58\uC744 \uC704\uD55C \uACF5\uAC04 */\n  label {\n    display: flex;\n    align-items: center;\n    font-size: 14px;\n    color: #333;\n    font-weight: bold;\n  }\n"])));
+exports.InputWrapper = styled_components_1["default"].div(templateObject_7 || (templateObject_7 = __makeTemplateObject(["\n  display: flex;\n  gap: 10px;\n"], ["\n  display: flex;\n  gap: 10px;\n"])));
+exports.InputBlock = (0, styled_components_1["default"])(LoginStyles_1.InputField)(templateObject_8 || (templateObject_8 = __makeTemplateObject(["\n  flex-grow: 1;\n"], ["\n  flex-grow: 1;\n"])));
+exports.PostcodeButton = styled_components_1["default"].button(templateObject_9 || (templateObject_9 = __makeTemplateObject(["\n  padding: 10px 15px;\n  border: 1px solid #333;\n  background: #333;\n  color: #fff;\n  cursor: pointer;\n  font-size: 14px;\n  flex-shrink: 0;\n"], ["\n  padding: 10px 15px;\n  border: 1px solid #333;\n  background: #333;\n  color: #fff;\n  cursor: pointer;\n  font-size: 14px;\n  flex-shrink: 0;\n"])));
+exports.CheckIcon = styled_components_1["default"].span(templateObject_10 || (templateObject_10 = __makeTemplateObject(["\n  color: #333;\n  margin-right: 5px;\n  font-size: 16px;\n"], ["\n  color: #333;\n  margin-right: 5px;\n  font-size: 16px;\n"])));
+// --- 약관 동의 ---
+exports.TermsContainer = styled_components_1["default"].div(templateObject_11 || (templateObject_11 = __makeTemplateObject(["\n  margin-top: 30px;\n"], ["\n  margin-top: 30px;\n"])));
+exports.AgreeAllRow = styled_components_1["default"].div(templateObject_12 || (templateObject_12 = __makeTemplateObject(["\n  display: flex;\n  align-items: center;\n  font-weight: bold;\n  padding-bottom: 10px;\n  border-bottom: 1px solid #333;\n"], ["\n  display: flex;\n  align-items: center;\n  font-weight: bold;\n  padding-bottom: 10px;\n  border-bottom: 1px solid #333;\n"])));
+exports.TermItem = styled_components_1["default"].div(templateObject_13 || (templateObject_13 = __makeTemplateObject(["\n  display: flex;\n  align-items: center;\n  padding: 8px 0;\n  font-size: 14px;\n\n  label {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n  }\n"], ["\n  display: flex;\n  align-items: center;\n  padding: 8px 0;\n  font-size: 14px;\n\n  label {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n  }\n"])));
+exports.TermLink = styled_components_1["default"].a(templateObject_14 || (templateObject_14 = __makeTemplateObject(["\n  margin-left: 10px;\n  color: #666;\n  text-decoration: underline;\n  font-size: 12px;\n"], ["\n  margin-left: 10px;\n  color: #666;\n  text-decoration: underline;\n  font-size: 12px;\n"])));
+// --- 버튼 ---
+exports.ActionRow = styled_components_1["default"].div(templateObject_15 || (templateObject_15 = __makeTemplateObject(["\n  display: flex;\n  justify-content: center;\n  gap: 15px;\n  margin-top: 40px;\n  padding-top: 20px;\n"], ["\n  display: flex;\n  justify-content: center;\n  gap: 15px;\n  margin-top: 40px;\n  padding-top: 20px;\n"])));
+exports.SubmitButton = (0, styled_components_1["default"])(LoginStyles_1.LoginButton)(templateObject_16 || (templateObject_16 = __makeTemplateObject(["\n  width: 150px;\n  margin-top: 0;\n"], ["\n  width: 150px;\n  margin-top: 0;\n"])));
+exports.CancelButton = (0, styled_components_1["default"])(exports.SubmitButton)(templateObject_17 || (templateObject_17 = __makeTemplateObject(["\n  background-color: #fff;\n  color: #333;\n  border: 1px solid #ccc;\n\n  &:hover {\n    background-color: #eee;\n  }\n"], ["\n  background-color: #fff;\n  color: #333;\n  border: 1px solid #ccc;\n\n  &:hover {\n    background-color: #eee;\n  }\n"])));
+var templateObject_1, templateObject_2, templateObject_3, templateObject_4, templateObject_5, templateObject_6, templateObject_7, templateObject_8, templateObject_9, templateObject_10, templateObject_11, templateObject_12, templateObject_13, templateObject_14, templateObject_15, templateObject_16, templateObject_17;
