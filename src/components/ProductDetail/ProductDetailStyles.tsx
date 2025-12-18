@@ -149,18 +149,23 @@ export const InquiryForm = styled.div`
   flex-direction: column;
   gap: 15px;
 
-  textarea {
+  input, select, textarea {
     width: 100%;
-    height: 150px;
-    padding: 15px;
+    padding: 12px 15px;
     border: 1px solid #ddd;
     border-radius: 4px;
-    resize: none;
     font-family: inherit;
     font-size: 14px;
     &:focus { outline: 1px solid #222; border-color: #222; }
   }
+
+  textarea {
+    height: 150px;
+    resize: none;
+  }
 `;
+
+
 
 export const SubmitButton = styled.button`
   align-self: flex-end;

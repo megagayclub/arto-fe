@@ -1,7 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
 
-// 백엔드 DTO 구조에 맞춤
 interface InquiryRequest {
   artworkId: number;
   title: string;
@@ -17,11 +16,21 @@ export const useInquiry = () => {
     setIsLoading(true);
     setError(null);
 
+    // 1. 저장된 토큰 가져오기 (보통 'token' 혹은 'accessToken' 이름으로 저장됨)
+    const token = localStorage.getItem("authToken"); 
+
     try {
-      // 프록시 설정(/api)이 되어있다고 가정
-      await axios.post("/api/v1/inquiries", data);
+      // 2. 백엔드 주소로 요청 (프록시가 없다면 http://localhost:8080 추가)
+      await axios.post("http://localhost:8080/api/v1/inquiries", data, {
+        headers: {
+          "Content-Type": "application/json",
+          // 3. 토큰이 있으면 헤더에 넣어줌
+          ...(token && { "Authorization": `Bearer ${token}` })
+        }
+      });
       return true;
     } catch (err: any) {
+      // 백엔드에서 준 에러 메시지를 우선 출력
       const errorMessage = err.response?.data?.message || "문의 등록에 실패했습니다.";
       setError(errorMessage);
       return false;
