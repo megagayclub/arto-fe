@@ -4,9 +4,9 @@ import { useMarket } from "./MarketContext";
 
 // --- 정렬 옵션 정의 ---
 const SORT_OPTIONS: { label: string; value: string }[] = [
-  { label: "安い順", value: "Latest" },
-  { label: "高い順", value: "PriceAsc" },
-  { label: "新着順", value: "PriceDesc" },
+  { label: "安い順", value: "PRICE_ASC" },
+  { label: "高い順", value: "PRICE_DESC" },
+  { label: "新着順", value: "LATEST" },
 ];
 
 // --- 스타일 수정 ---
@@ -69,12 +69,13 @@ const SortButton = styled.button<{ $isSelected: boolean }>`
 
 
 export const MarketFilter: React.FC = () => {
-  const { filters, setFilters } = useMarket();
+  const { filters, setFilters, applyFilters } = useMarket();
 
   const handleSortClick = (sortValue: string) => {
-    // 버튼 클릭 시 filters.sort 상태를 업데이트 -> useEffect에 의해 자동으로 fetchProducts 실행
-    setFilters((prev) => ({ ...prev, sort: sortValue }));
-  };
+  const nextFilters = { ...filters, sort: sortValue };
+  setFilters(nextFilters); 
+  applyFilters(nextFilters); 
+};
 
   return (
     <FilterContainer>

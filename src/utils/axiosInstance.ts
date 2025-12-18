@@ -2,8 +2,8 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  // ✅ Vite proxy("/api" -> http://localhost:8080) 타게 하기
-  baseURL: "/api",
+  // baseURL: "/api", (기존)
+  baseURL: "http://52.79.193.77:8080/api", // 실제 서버 주소
   headers: {
     "Content-Type": "application/json",
   },

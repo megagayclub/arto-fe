@@ -1,21 +1,16 @@
-# node 이미지 기반 Docker 이미지 생성
-FROM node
-
-# 작업 디렉토리 설정
-WORKDIR /src
-
-# COPY <복사할 경로/파일명> <붙여넣을 디렉토리>
-# package.json 작업 디렉토리에 복사
-# . = ./ 과 동일 현재 작업 디렉토리 의미
-COPY package.json .
-
-# 의존성 설치 명령어 실행
+# 1단계: 빌드 (TypeScript 체크와 Vite 빌드 수행)
+FROM node:18-alpine AS build
+WORKDIR /app
+COPY package*.json ./
 RUN npm install
-# 현재 디렉토리의 모든 파일을 도커 컨테이너의 작업 디렉토리에 복사
 COPY . .
+# package.json에 적힌 tsc && vite build 실행
+RUN npm run build
 
-# 3000번 포트 노출
-EXPOSE 3000
-
-# npm start 스크립트 실행
-CMD ["npm","run","dev"]
+# 2단계: 실행 (빌드된 결과물만 Nginx로 가볍게 서빙)
+FROM nginx:stable-alpine
+# Vite의 기본 빌드 폴더인 dist를 Nginx 경로로 복사
+COPY --from=build /app/dist /usr/share/nginx/html
+# Nginx 기본 포트 80 노출
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

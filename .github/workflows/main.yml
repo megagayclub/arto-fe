@@ -1,63 +1,66 @@
 name: CI/CD Docker
 
-# 트리거를 수행할 브랜치를 지정합니다.
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
-# 환경설정
 env:
-  DOCKER_IMAGE: ghcr.io/${{ github.actor }}/arto-fe-deploy
+  DOCKER_IMAGE: ghcr.io/${{ github.repository_owner }}/arto-fe-deploy
   VERSION: ${{ github.sha }}
   NAME: go_cicd
 
 jobs:
-  # 빌드 Job
   build:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      # github repository에서 checkout
-      - uses: actions/checkout@v3
-      # docker build 수행
-      - name: Set up docker buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v1
-      - name: Cache docker layers
-        uses: actions/cache@v3
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ env.VERSION }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
-      # GitHub 컨테이너 레지스트리에 로그인 후 빌드 & 푸시
-      - name: Login to ghcr
-        uses: docker/login-action@v1
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GHCR_TOKEN }}
+
       - name: Build and push
-        id: docker_build
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v5
         with:
-          builder: ${{ steps.buildx.outputs.name }}
+          context: .
           push: true
           tags: ${{ env.DOCKER_IMAGE }}:latest
-  # 배포 Job
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
   deploy:
-    needs: build  # build 후에 실행되도록 정의
+    needs: build
     name: Deploy
-    runs-on: [ self-hosted, label-go ] # AWS ./configure에서 사용할 label명
+    runs-on: [self-hosted, label-go]
     steps:
-      - name: Login to ghcr
-        uses: docker/login-action@v1
+      - name: Login to GHCR
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GHCR_TOKEN }}
-      # 3000 -> 80 포트로 수행하도록 지정
-      - name: Docker run
+
+      - name: Docker deploy
         run: |
-          docker stop ${{ env.NAME }} && docker rm ${{ env.NAME }} && docker rmi ${{ env.DOCKER_IMAGE }}:latest
-          docker run -d -p 81:3000 --name go_cicd --restart always ${{ env.DOCKER_IMAGE }}:latest
+          # 1. 기존 컨테이너 및 쓰레기 이미지 정리 (용량 확보 및 꼬임 방지)
+          docker stop ${{ env.NAME }} 2>/dev/null || true
+          docker rm ${{ env.NAME }} 2>/dev/null || true
+          docker image prune -f
+
+          # 2. 최신 이미지 가져오기
+          docker pull ${{ env.DOCKER_IMAGE }}:latest
+
+          # 3. [중요] Nginx 기반으로 실행하므로 내부 포트를 80으로 연결
+          # 외부 81번 -> 컨테이너 80번
+          docker run -d \
+            --name ${{ env.NAME }} \
+            -p 81:80 \
+            --restart always \
+            ${{ env.DOCKER_IMAGE }}:latest
