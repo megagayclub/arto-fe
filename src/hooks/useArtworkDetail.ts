@@ -35,7 +35,7 @@ type UseArtworkDetailReturn = {
   error: string | null;
 };
 
-const API_BASE_URL = "http://localhost:8080";
+const API_BASE_URL = "http://52.79.193.77:8080";
 
 export const useArtworkDetail = (artworkId: number): UseArtworkDetailReturn => {
   const [artworkDetail, setArtworkDetail] = useState<ProductDetailType | null>(null);
