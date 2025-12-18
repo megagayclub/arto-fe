@@ -23,10 +23,6 @@ const ProductInfoTable: React.FC<{ data: ProductDetailType }> = ({ data }) => {
   const infoRows = [
     { label: "작품명 | Title", value: data.title },
     { label: "작가명 | Artist", value: data.artist },
-    { label: "제작년 | Year", value: data.year },
-    { label: "장르 | Genre", value: data.genre },
-    { label: "소재 | Medium", value: data.medium },
-    { label: "액자 | Frame", value: data.frame },
     { label: "사이즈 | Size", value: data.size },
     { label: "배송비 | Shipping Cost", value: `${data.shippingCost.toLocaleString()}₩` },
     { label: "배송방법 | Shipping", value: data.shippingMethod },
@@ -98,7 +94,7 @@ export const ProductDetailLayout: React.FC = () => {
     <PageLayout>
       <MainContent>
         <ImageArea>
-          <img src={product.thumbnailImageUrl} alt={product.title} />
+          <img src={product.imagePlaceholder} alt={product.title} />
           <p style={{ marginTop: "20px", fontSize: "12px", color: "#666" }}>
             ©{product.year} {product.artist}. All rights reserved.
           </p>
