@@ -1,24 +1,11 @@
-// src/components/ProductDetail/ProductDetail.tsx
-import React from "react";
+import React, { useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { ProductDetailType, useArtworkDetail } from "../../hooks/useArtworkDetail";
 import { useAddToCart } from "../../hooks/useAddToCart";
-import {
-  PageLayout,
-  MainContent,
-  ImageArea,
-  InfoArea,
-  Title,
-  ArtistName,
-  InfoTable,
-  InfoRow,
-  PriceText,
-  ButtonGroup,
-  BuyButton,
-  ActionButton,
-} from "./ProductDetailStyles";
+import { useInquiry } from "../../hooks/useInquiry"; // ✅ 새 커스텀 훅 임포트
+import * as S from "./ProductDetailStyles";
 
-const ICON_HEART = "🤍";
+const ICON_INQUIRY = "✉️";
 
 const ProductInfoTable: React.FC<{ data: ProductDetailType }> = ({ data }) => {
   const infoRows = [
@@ -30,120 +17,90 @@ const ProductInfoTable: React.FC<{ data: ProductDetailType }> = ({ data }) => {
   ];
 
   return (
-    <InfoTable>
+    <S.InfoTable>
       {infoRows.map((row, index) => (
-        <InfoRow key={index}>
+        <S.InfoRow key={index}>
           <span>{row.label}</span>
           <span>{row.value}</span>
-        </InfoRow>
+        </S.InfoRow>
       ))}
-    </InfoTable>
+    </S.InfoTable>
   );
 };
 
 export const ProductDetailLayout: React.FC = () => {
-  // ✅ URL에서 /product/:id 가져오기
   const { id } = useParams<{ id: string }>();
-
-  // ✅ 숫자로 변환
   const artworkId = Number(id);
-
-  // ✅ 이상한 값 방어
-  if (!id || Number.isNaN(artworkId)) {
-    return (
-      <PageLayout>
-        <MainContent>
-          <p style={{ color: "red", padding: "20px" }}>잘못된 작품 ID입니다: {id}</p>
-        </MainContent>
-      </PageLayout>
-    );
-  }
+  
+  const [isInquiryOpen, setIsInquiryOpen] = useState(false);
+  const inquiryRef = useRef<HTMLDivElement>(null);
 
   const { artworkDetail: product, isLoading, error } = useArtworkDetail(artworkId);
-
-  // ✅ 카트 담기 훅
   const { addToCart, isLoading: adding, error: addError } = useAddToCart();
 
   const handleAddToCart = async () => {
     const ok = await addToCart(artworkId);
-    if (ok) {
-      alert("장바구니에 담았습니다!");
-      // 원하면 여기서 즉시 마이페이지로 보내도 됨:
-      // navigate("/mypage");
+    if (ok) alert("장바구니에 담았습니다!");
+  };
+
+  const toggleInquiry = () => {
+    setIsInquiryOpen((prev) => !prev);
+    if (!isInquiryOpen) {
+      setTimeout(() => {
+        inquiryRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 100);
     }
   };
 
-  if (isLoading) {
-    return (
-      <PageLayout>
-        <MainContent>
-          <p>작품 정보를 불러오는 중입니다...</p>
-        </MainContent>
-      </PageLayout>
-    );
-  }
-
-  if (error) {
-    return (
-      <PageLayout>
-        <MainContent>
-          <p style={{ color: "red", padding: "20px" }}>오류 발생: {error}</p>
-        </MainContent>
-      </PageLayout>
-    );
-  }
-
-  if (!product) {
-    return (
-      <PageLayout>
-        <MainContent>
-          <p>작품 정보를 찾을 수 없습니다.</p>
-        </MainContent>
-      </PageLayout>
-    );
-  }
+  if (isLoading) return <S.PageLayout><S.MainContent><p>로딩 중...</p></S.MainContent></S.PageLayout>;
+  if (error || !id || isNaN(artworkId)) return <S.PageLayout><S.MainContent><p style={{ color: "red" }}>오류 발생</p></S.MainContent></S.PageLayout>;
+  if (!product) return null;
 
   return (
-    <PageLayout>
-      <MainContent>
-        <ImageArea>
-          <img src={product.imagePlaceholder} alt={product.title} />
-          <p style={{ marginTop: "20px", fontSize: "12px", color: "#666" }}>
-            ©{product.year} {product.artist}. All rights reserved.
-          </p>
-        </ImageArea>
+    <S.PageLayout>
+      <S.Container>
+        <S.MainContent>
+          <S.ImageArea>
+            <img src={product.imagePlaceholder} alt={product.title} />
+            <p>©{product.year} {product.artist}. All rights reserved.</p>
+          </S.ImageArea>
 
-        <InfoArea>
-          <Title>작품명 | Title</Title>
-          <ArtistName>{product.title}</ArtistName>
+          <S.InfoArea>
+            <S.Title>작품명 | Title</S.Title>
+            <S.ArtistName>{product.title}</S.ArtistName>
 
-          <Title>작가명 | Artist</Title>
-          <ArtistName>{product.artist}</ArtistName>
+            <ProductInfoTable data={product} />
 
-          <ProductInfoTable data={product} />
+            <S.Title>판매가격 | Price</S.Title>
+            <S.PriceText>{product.price.toLocaleString()}₩</S.PriceText>
 
-          <Title>판매가격 | Price</Title>
-          <PriceText>{product.price.toLocaleString()}₩</PriceText>
+            {addError && <p style={{ color: "red", fontSize: "12px" }}>{addError}</p>}
 
-          {/* ✅ 카트 담기 에러 표시 */}
-          {addError && (
-            <p style={{ color: "red", marginTop: "10px" }}>
-              장바구니 담기 오류: {addError}
-            </p>
-          )}
+            <S.ButtonGroup>
+              <S.ActionButton onClick={toggleInquiry} $active={isInquiryOpen}>
+                {ICON_INQUIRY}&nbsp;<span>{isInquiryOpen ? "문의닫기" : "문의하기"}</span>
+              </S.ActionButton>
 
-          <ButtonGroup>
-            <ActionButton>
-              {ICON_HEART}&nbsp;<span style={{ fontSize: "14px" }}>문의하기</span>
-            </ActionButton>
+              <S.BuyButton onClick={handleAddToCart} disabled={adding}>
+                {adding ? "처리 중..." : "카트에 넣기"}
+              </S.BuyButton>
+            </S.ButtonGroup>
+          </S.InfoArea>
+        </S.MainContent>
 
-            {/* ✅ 카트에 넣기 연결 */}
-            <BuyButton onClick={handleAddToCart} disabled={adding}>
-              {adding ? "담는 중..." : "카트에 넣기"}
-            </BuyButton>
-          </ButtonGroup>
-        </InfoArea>
-      </MainContent>
-    </PageLayout>
+        {isInquiryOpen && (
+          <S.InquirySection ref={inquiryRef}>
+            <S.InquiryTitle>작품 문의하기 | Inquiry</S.InquiryTitle>
+            <p>작품에 대해 궁금한 점을 남겨주시면 작가님 혹은 담당 갤러리에서 답변을 드립니다.</p>
+            <S.InquiryForm>
+              <textarea placeholder="문의 내용을 상세히 입력해주세요." />
+              <S.SubmitButton onClick={() => alert("문의가 발송되었습니다.")}>
+                문의 보내기
+              </S.SubmitButton>
+            </S.InquiryForm>
+          </S.InquirySection>
+        )}
+      </S.Container>
+    </S.PageLayout>
   );
 };
