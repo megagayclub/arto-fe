@@ -98,7 +98,7 @@ export const ProductDetailLayout: React.FC = () => {
     <PageLayout>
       <MainContent>
         <ImageArea>
-          <img src={product.thumbnailImageUrl} alt={product.title} />
+          <img src={product.imagePlaceholder} alt={product.title} />
           <p style={{ marginTop: "20px", fontSize: "12px", color: "#666" }}>
             ©{product.year} {product.artist}. All rights reserved.
           </p>
