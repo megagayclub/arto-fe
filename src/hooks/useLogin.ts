@@ -41,8 +41,12 @@ export const useLogin = () => {
             const response = await axios.post<LoginResponse>(LOGIN_URL, data); 
             
             // 2. 인증 컨텍스트에 토큰 및 이메일 저장
-            const { accessToken } = response.data;
+            const { accessToken, tokenType } = response.data;
             login(data.email, accessToken); 
+
+            // 🔥 (2) localStorage에 저장 (이 줄이 핵심)
+            localStorage.setItem("accessToken", accessToken);
+            localStorage.setItem("tokenType", tokenType); // 보통 "Bearer"
 
             return true; // 로그인 성공
 

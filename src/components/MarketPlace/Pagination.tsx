@@ -9,9 +9,9 @@ const PagerContainer = styled.div`
   margin-top: 20px;
 `;
 
-const PageButton = styled.button<{ isActive: boolean }>`
-  background: ${(props) => (props.isActive ? "#007bff" : "#fff")};
-  color: ${(props) => (props.isActive ? "#fff" : "#007bff")};
+const PageButton = styled.button<{ $isActive: boolean }>`
+  background: ${(props) => (props.$isActive ? "#007bff" : "#fff")};
+  color: ${(props) => (props.$isActive ? "#fff" : "#007bff")};
   border: 1px solid #007bff;
   padding: 8px 15px;
   border-radius: 5px;
@@ -19,7 +19,7 @@ const PageButton = styled.button<{ isActive: boolean }>`
   transition: background 0.3s;
 
   &:hover:not(:disabled) {
-    background: ${(props) => (props.isActive ? "#0056b3" : "#eaf4ff")};
+    background: ${(props) => (props.$isActive ? "#0056b3" : "#eaf4ff")};
   }
 
   &:disabled {
@@ -38,7 +38,7 @@ export const Pagination: React.FC = () => {
       <PageButton
         onClick={() => setCurrentPage(currentPage - 1)}
         disabled={currentPage === 1}
-        isActive={false} // 항상 false로 설정하여 '이전' 버튼 스타일 유지
+        $isActive={false} // 항상 false로 설정하여 '이전' 버튼 스타일 유지
       >
         Prev
       </PageButton>
@@ -46,7 +46,7 @@ export const Pagination: React.FC = () => {
       {pageNumbers.map((number) => (
         <PageButton
           key={number}
-          isActive={number === currentPage}
+          $isActive={number === currentPage}
           onClick={() => setCurrentPage(number)}
         >
           {number}
@@ -56,7 +56,7 @@ export const Pagination: React.FC = () => {
       <PageButton
         onClick={() => setCurrentPage(currentPage + 1)}
         disabled={currentPage === totalPages}
-        isActive={false} // 항상 false로 설정하여 '다음' 버튼 스타일 유지
+        $isActive={false} // 항상 false로 설정하여 '다음' 버튼 스타일 유지
       >
         Next
       </PageButton>

@@ -35,15 +35,15 @@ const Header: React.FC = () => {
     // 로그인 상태: 마이페이지 또는 로그아웃
     <>
       {/* 🌟 마이페이지 (MY PAGE) 링크 */}
-      <NavLink href="/mypage" style={{ marginLeft: '10px' }}>MY PAGE</NavLink> 
+      <NavLink href="/mypage" style={{ marginLeft: '10px' }}><FaUser size={20} /></NavLink> 
       
       {/* 🌟 로그아웃 버튼 (NavLink 대신 버튼 사용 가능) */}
-      <NavLink as="button" onClick={logout} style={{ marginLeft: '10px' }}>ログアウト</NavLink>
+      <NavLink onClick={logout} style={{ marginLeft: '5px', marginRight: '30px' }}>ログアウト</NavLink>
     </>
   ) : (
     // 로그아웃 상태: 로그인 페이지
     <>
-      <NavLink href="/login" style={{ marginLeft: '10px' }}>ログイン</NavLink>
+      <NavLink href="/login" style={{ marginLeft: '5px', marginRight: '30px' }}>ログイン</NavLink>
       {/* 회원가입은 유틸리티 아이콘 옆에 추가하지 않고 로그인 페이지 내에 두는 것이 일반적입니다. */}
     </>
   );
@@ -52,7 +52,9 @@ const Header: React.FC = () => {
     <HeaderContainer>
       {/* 1. 로고 섹션 */}
       <LogoSection>
-        <LogoText>rto</LogoText>
+        <NavLink href="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <LogoText>rto</LogoText>
+        </NavLink>
       </LogoSection>
 
       {/* 2. 내비게이션 및 유틸리티 섹션 */}
@@ -69,9 +71,6 @@ const Header: React.FC = () => {
           {/* 검색 및 카트 아이콘 */}
           <IoIosSearch size={25} href="/search" title="検索" />
           <IoIosCart size={25} href="/cart" title="カート" />
-          
-          {/* 사용자 아이콘 (로그인 상태에 따라 다른 링크를 포함할 수 있습니다) */}
-          <FaUser size={20} />
           
           <Separator>|</Separator>
           
