@@ -2,6 +2,7 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 import { ProductDetailType, useArtworkDetail } from "../../hooks/useArtworkDetail";
+import { useAddToCart } from "../../hooks/useAddToCart";
 import {
   PageLayout,
   MainContent,
@@ -47,7 +48,7 @@ export const ProductDetailLayout: React.FC = () => {
   // ✅ 숫자로 변환
   const artworkId = Number(id);
 
-  // ✅ 이상한 값(예: "{2}" 같은 거) 방어
+  // ✅ 이상한 값 방어
   if (!id || Number.isNaN(artworkId)) {
     return (
       <PageLayout>
@@ -59,6 +60,18 @@ export const ProductDetailLayout: React.FC = () => {
   }
 
   const { artworkDetail: product, isLoading, error } = useArtworkDetail(artworkId);
+
+  // ✅ 카트 담기 훅
+  const { addToCart, isLoading: adding, error: addError } = useAddToCart();
+
+  const handleAddToCart = async () => {
+    const ok = await addToCart(artworkId);
+    if (ok) {
+      alert("장바구니에 담았습니다!");
+      // 원하면 여기서 즉시 마이페이지로 보내도 됨:
+      // navigate("/mypage");
+    }
+  };
 
   if (isLoading) {
     return (
@@ -112,11 +125,22 @@ export const ProductDetailLayout: React.FC = () => {
           <Title>판매가격 | Price</Title>
           <PriceText>{product.price.toLocaleString()}₩</PriceText>
 
+          {/* ✅ 카트 담기 에러 표시 */}
+          {addError && (
+            <p style={{ color: "red", marginTop: "10px" }}>
+              장바구니 담기 오류: {addError}
+            </p>
+          )}
+
           <ButtonGroup>
             <ActionButton>
               {ICON_HEART}&nbsp;<span style={{ fontSize: "14px" }}>문의하기</span>
             </ActionButton>
-            <BuyButton>카트에 넣기</BuyButton>
+
+            {/* ✅ 카트에 넣기 연결 */}
+            <BuyButton onClick={handleAddToCart} disabled={adding}>
+              {adding ? "담는 중..." : "카트에 넣기"}
+            </BuyButton>
           </ButtonGroup>
         </InfoArea>
       </MainContent>
