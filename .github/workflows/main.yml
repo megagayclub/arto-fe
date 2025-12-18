@@ -59,7 +59,8 @@ jobs:
           # Vite의 포트와 호스트 설정을 고려하여 실행 (81번 포트로 접속)
           # 아까 로그에서 5173번이 떴으므로 내부 포트를 5173으로 맞추는 것이 안전합니다.
           docker run -d \
-            -p 81:5173 \
+            -i -t \
+            -p 81:3000 \
             --name ${{ env.NAME }} \
             --restart always \
             ${{ env.DOCKER_IMAGE }}:latest
