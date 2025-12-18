@@ -25,29 +25,25 @@ export const MAIN_FILTER_ICONS: FilterIcon[] = [
 
 export const SPACE_OPTIONS = [
   { label: "거실", value: 1 },
-  { label: "다이닝룸", value: 2 },
-  { label: "서재", value: 3 },
-  { label: "침실", value: 4 },
-  { label: "놀이방", value: 5 },
-  { label: "복도", value: 6 },
-  { label: "로비", value: 7 },
-  { label: "회의실", value: 8 },
-  { label: "카페", value: 9 },
+  { label: "침실", value: 2 },
+  { label: "주방", value: 3 },
+  { label: "사무실", value: 4 },
+  { label: "현관", value: 5 }
 ];
 
 export const MOOD_OPTIONS = [
   { label: "모던", value: 1 },
-  { label: "빈티지", value: 2 },
-  { label: "미니멀", value: 3 },
-  { label: "모던클래식", value: 4 },
-  { label: "인더스트리얼", value: 5 },
+  { label: "코지", value: 2 },
+  { label: "빈티지", value: 3 },
+  { label: "미니멀", value: 4 },
+  { label: "추상화", value: 5 },
 ];
 
 // 기타 옵션은 문자열 리스트이므로 그대로 두거나 mapping합니다.
 export const ETC_OPTIONS = [
-  { label: "무료배송", value: "FREE" },
-  { label: "착불배송", value: "COLLECT" },
-  { label: "퀵배송", value: "QUICK" },
+  { label: "무료배송", value: "FREE_SHIPPING" },
+  { label: "착불배송", value: "CASH_ON_DELIVERY" },
+  { label: "퀵배송", value: "PARCEL" },
 ];
 
 export const MORPH_OPTIONS = [
@@ -55,10 +51,9 @@ export const MORPH_OPTIONS = [
   { label: "가로 사각형", value: "HORIZONTAL_RECTANGLE" },
   { label: "원형", value: "CIRCLE" },
   { label: "정사각형", value: "SQUARE" },
-  { label: "다각형", value: "POLYGON" },
-  { label: "테이블", value: "TABLE" },
-  { label: "다발", value: "BUNDLE" },
-  { label: "기타", value: "ETC" },
+  { label: "분리된", value: "DIVIDED" },
+  { label: "입체적", value: "THREE_DIMENSIONAL" },
+  { label: "비정형적", value: "IRREGULAR" },
 ];
 
 export const COLOR_OPTIONS = [
@@ -69,19 +64,5 @@ export const COLOR_OPTIONS = [
   { hex: "#0000FF", name: "Blue", value: 5 },
   { hex: "#000000", name: "Black", value: 6 },
   { hex: "#FFFFFF", name: "White", value: 7 },
-  { hex: "#FFC0CB", name: "Pink", value: 8 },
-  { hex: "#800080", name: "Purple", value: 9 },
-  { hex: "#A9A9A9", name: "Grey", value: 10 },
-  { hex: "#8B4513", name: "Brown", value: 11 },
-  { hex: "#F5F5DC", name: "Beige", value: 12 },
-  { hex: "#000080", name: "Navy", value: 13 },
-  { hex: "#40E0D0", name: "Turquoise", value: 14 },
-  { hex: "#FFD700", name: "Gold", value: 15 },
 ];
 
-// src/data/FilterData.ts 또는 MarketFilter.tsx 상단
-export const SORT_OPTIONS: { label: string; value: string }[] = [
-  { label: "최신순", value: "LATEST" },      // 백엔드: LATEST
-  { label: "가격 낮은순", value: "PRICE_ASC" }, // 백엔드: PRICE_ASC
-  { label: "가격 높은순", value: "PRICE_DESC" }, // 백엔드: PRICE_DESC
-];

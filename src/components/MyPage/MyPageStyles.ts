@@ -3,12 +3,13 @@ import styled, { css } from "styled-components";
 
 // --- 기본 레이아웃 ---
 export const LayoutContainer = styled.div`
-  max-width: 1200px;
+  max-width: 1000px;
   margin: 50px auto;
   padding: 0 20px;
   display: flex;
   gap: 30px;
   font-family: Arial, sans-serif;
+  margin-top: 100px;
 `;
 
 export const SidebarContainer = styled.div`
@@ -92,13 +93,48 @@ export const SectionContent = styled.div`
   padding: 20px;
 `;
 
-// --- 주문 상태 요약 ---
-export const OrderSummaryContainer = styled(SectionWrapper)`
-  display: flex;
-  border: none;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  background: #f9f9f9;
+// src/components/MyPage/MyPageStyles.ts 에 추가 또는 수정
+
+export const TopDashboard = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 2fr; /* 왼쪽 회원정보(1) : 오른쪽 주문현황(2) 비율 */
+  gap: 20px;
   margin-bottom: 30px;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+export const InfoCard = styled.div`
+  background: #f4f4f4; /* 회색 섹션 */
+  padding: 20px;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  h3 {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 5px;
+  }
+
+  .content {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+  }
+`;
+
+// 기존 OrderSummaryContainer 수정 (회색 배경 유지)
+export const OrderSummaryContainer = styled.div`
+  display: flex;
+  background: #f4f4f4; /* 회색 섹션 */
+  border-radius: 4px;
+  flex-grow: 1;
 `;
 
 export const StatusItem = styled.div`

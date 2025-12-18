@@ -1,6 +1,7 @@
 // src/components/MyPage/MyPage.tsx
 import React, { ReactNode } from "react";
 import { MyPageProvider, useMyPage } from "./MyPageContext";
+import { useAuth } from "../../context/AuthContext";
 import {
   LayoutContainer,
   SidebarContainer,
@@ -92,6 +93,7 @@ const OrderSummary: React.FC = () => {
 // 3. 마이 메뉴 (사이드바)
 const MySidebarMenu: React.FC = () => {
   const { activeSection, setActiveSection } = useMyPage();
+  const { userEmail } = useAuth();
 
   const menuItems: {
     label: string;
@@ -108,7 +110,7 @@ const MySidebarMenu: React.FC = () => {
       <AccountInfoBox>
         <h3>회원정보</h3>
         <p>E-mail(ID):</p>
-        <p>jyc@gmu.ac.kr</p>
+        <p><strong>{userEmail || "로그인 정보 없음"}</strong></p>
         <Button>비밀번호 변경</Button>
         <Button>회원 탈퇴</Button>
       </AccountInfoBox>
@@ -168,44 +170,3 @@ export const MyPage = Object.assign(MyPageLayoutBase, {
   Section: MySection,
   Product: ProductItem,
 });
-
-// --- 최종 사용 예시 (App.tsx에 들어갈 내용) ---
-
-/*
-const MyPageContent: React.FC = () => {
-    return (
-        <MyPage.Layout>
-            <MyPage.Sidebar />
-            
-            <MyPage.Content>
-                <MyPage.Order />
-
-                { // 1. 찜 목록 섹션
-                <MyPage.Section title="찜 목록 (4)">
-                    <MyPage.Product id={1} title="작품1" date="2022년 9월 12일" price={48000} image="" />
-                    <MyPage.Product id={2} title="작품2" date="2022년 9월 1일" price={35000} image="" />
-                </MyPage.Section>
-                }
-                
-                { // 2. 장바구니 섹션
-                <MyPage.Section title="장바구니 (1)">
-                    <p style={{fontSize: '12px', color: '#888'}}>장바구니 콘텐츠가 여기에 들어갑니다.</p>
-                </MyPage.Section>
-                }
-                
-                { // 3. 구매 이력 섹션
-                <MyPage.Section title="구매 이력">
-                    <p style={{fontSize: '14px', color: '#999', textAlign: 'center'}}>구매 이력이 없습니다.</p>
-                </MyPage.Section>
-                }
-
-                { // 4. 문의사항 섹션
-                <MyPage.Section title="문의 이력">
-                    <p style={{fontSize: '14px', color: '#999', textAlign: 'center'}}>문의 이력이 없습니다.</p>
-                </MyPage.Section>
-                }
-            </MyPage.Content>
-        </MyPage.Layout>
-    );
-};
-*/
