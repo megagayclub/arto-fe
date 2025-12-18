@@ -173,7 +173,7 @@ export const MyPageLayout: React.FC = () => {
           </MyPage.Section>
 
           {/* 2-4. 구매 이력 섹션 (API 연동) */}
-          <MyPage.Section title="구매 이력">
+          <MyPage.Section title="주문 / 구매 이력">
             <PurchaseHistoryContent />
           </MyPage.Section>
 
