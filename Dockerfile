@@ -1,5 +1,5 @@
 # 1단계: 빌드 (TypeScript 체크와 Vite 빌드 수행)
-FROM node:18-alpine AS build
+FROM node:20-alpine AS build
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
