@@ -105,10 +105,28 @@ const MainPageLayout: React.FC = () => {
         >
           <div>
             <StyledH1 data-scroll data-scroll-speed="1">
-              <span>Arto</span> 
+              <span>그림구매의 시작, Arto</span> 
             </StyledH1>
+            <video
+    autoPlay
+    loop
+    muted
+    playsInline
+    style={{
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      objectFit: 'cover',
+      zIndex: 0
+    }}
+  >
+    <source src="/videos/mainpage_video.mp4" type="video/mp4" />
+    브라우저가 비디오를 지원하지 않습니다.
+  </video>
             <StyledP data-scroll data-scroll-speed="2" data-scroll-delay="0.2">
-              with GSAP ScrollTrigger & Locomotive Scroll
+              대중이 직접 선택한 청년·신진화가의 작품을 만나보세요.
             </StyledP>
           </div>
         </StyledSection>
@@ -117,8 +135,10 @@ const MainPageLayout: React.FC = () => {
         <StyledSectionPin>
           <PinWrap ref={pinWrapRef}>
             <StyledH2>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua.
+              공간디자인 전문가가 제안하는 아트 스타일링
+블루 스펙트럼 인테리어
+시원한 블루톤으로 꾸민 나만의 안식처,
+심신을 진정시키는 감성적 역할뿐 아니라 공간의 중심을 잡아줍니다
             </StyledH2>
             <StyledImage
               src="https://images.pexels.com/photos/5207262/pexels-photo-5207262.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=900"
