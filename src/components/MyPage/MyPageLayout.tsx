@@ -1,11 +1,11 @@
+// src/components/MyPage/MyPageLayout.tsx
 import React from "react";
 import styled from "styled-components";
 
 import { useAuth } from "../../context/AuthContext";
 import { MyPage } from "./MyPage";
-import { TopDashboard, InfoCard } from "./MyPageStyles"; // 🌟 스타일 추가 임포트
+import { TopDashboard, InfoCard } from "./MyPageStyles";
 
-// API 훅 임포트
 import { useMyWishlist } from "../../hooks/useMyWishlist";
 import { useMyCart } from "../../hooks/useMyCart";
 import { useMyOrders } from "../../hooks/useMyOrders";
@@ -17,7 +17,23 @@ const PageWrapper = styled.div`
   background-color: #fff;
 `;
 
-// --- 하위 리스트 컴포넌트 (구매이력) ---
+// 삭제 버튼 전용 스타일 (styled-components)
+const DeleteButton = styled.button`
+  background: none;
+  border: 1px solid #ddd;
+  padding: 6px 12px;
+  font-size: 12px;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background-color: #f5f5f5;
+    color: #ff4d4f;
+    border-color: #ff4d4f;
+  }
+`;
+
 const PurchaseHistoryContent: React.FC = () => {
   const { orders, isLoading, error } = useMyOrders();
 
@@ -48,14 +64,14 @@ const PurchaseHistoryContent: React.FC = () => {
   );
 };
 
-// --- 메인 레이아웃 컴포넌트 ---
 export const MyPageLayout: React.FC = () => {
   const { userEmail } = useAuth();
   
   const { wishlist, isLoading: wishLoading, error: wishError } = useMyWishlist();
   const wishlistItems = Array.isArray(wishlist) ? wishlist : [];
 
-  const { cart, isLoading: cartLoading, error: cartError } = useMyCart();
+  // 🌟 removeItem 함수 추가 추출
+  const { cart, isLoading: cartLoading, removeItem } = useMyCart();
   const cartItems = cart?.items ?? [];
 
   const { inquiries, isLoading: inqLoading, error: inqError } = useMyInquiries();
@@ -64,13 +80,7 @@ export const MyPageLayout: React.FC = () => {
   return (
     <PageWrapper>
       <MyPage>
-        {/* 1. 사이드바 (메뉴 위주) */}
-        
-
-        {/* 2. 메인 콘텐츠 영역 */}
         <MyPage.Content>
-          {/* <MyPage.Sidebar /> */}
-          {/* 🌟 상단 대시보드 영역: 회원정보 + 결제/배송 */}
           <TopDashboard>
             <InfoCard>
               <h3>회원 정보</h3>
@@ -79,12 +89,9 @@ export const MyPageLayout: React.FC = () => {
                 <p>{userEmail || "로그인이 필요합니다."}</p>
               </div>
             </InfoCard>
-
             <MyPage.Order /> 
           </TopDashboard>
-  
 
-          {/* 3. 리스트 섹션들 */}
           {/* 찜 목록 */}
           <MyPage.Section title={`찜 목록 (${wishlistItems.length})`}>
             {wishLoading && <p>불러오는 중...</p>}
@@ -112,7 +119,12 @@ export const MyPageLayout: React.FC = () => {
                 title={item.title}
                 price={Number(item.price)}
                 image={item.thumbnailImageUrl}
-              />
+                // 🌟 삭제 버튼 추가 (MyPage.Product 컴포넌트 내부에 children을 렌더링하도록 구현되어 있어야 함)
+              >
+                <DeleteButton onClick={() => removeItem(item.cartItemId)}>
+                  삭제
+                </DeleteButton>
+              </MyPage.Product>
             ))}
           </MyPage.Section>
 

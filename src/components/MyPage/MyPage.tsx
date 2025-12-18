@@ -1,4 +1,3 @@
-// src/components/MyPage/MyPage.tsx
 import React, { ReactNode } from "react";
 import { MyPageProvider, useMyPage } from "./MyPageContext";
 import { useAuth } from "../../context/AuthContext";
@@ -22,17 +21,16 @@ import {
 
 // --- 하위 컴포넌트 정의 ---
 
-// 1. 작품 항목 컴포넌트 (재사용)
 interface ProductProps {
   id: number;
   title: string;
-  titleLabel?: string;    // ✅ 추가 (기본: 작품명)
-  date?: string;          // ✅ optional로 변경
-  dateLabel?: string;     // ✅ 라벨 커스터마이징
-  price?: number;   // ✅ optional
-  image?: string;   // ✅ optional
-
-  hideImage?: boolean; // ✅ 추가
+  titleLabel?: string;
+  date?: string;
+  dateLabel?: string;
+  price?: number;
+  image?: string;
+  hideImage?: boolean;
+  children?: ReactNode; // 🌟 추가: 삭제 버튼 등 액션 버튼을 넣을 공간
 }
 
 const ProductItem: React.FC<ProductProps> = ({
@@ -43,9 +41,9 @@ const ProductItem: React.FC<ProductProps> = ({
   price,
   image,
   hideImage,
+  children, // 🌟 children 비구조화 할당
 }) => (
   <ProductItemWrapper>
-    {/* ✅ 문의 섹션에서는 이미지 영역 자체를 제거 */}
     {!hideImage && (
       <ProductImage>
         {image && (
@@ -61,15 +59,21 @@ const ProductItem: React.FC<ProductProps> = ({
     <ProductInfo>
       {date && <p>{dateLabel ?? "작품등록일"}: {date}</p>}
       <p>{titleLabel ?? "작품명"}: {title}</p>
-
       {typeof price === "number" && (
         <span>가격: {price.toLocaleString()}₩</span>
       )}
     </ProductInfo>
+
+    {/* 🌟 장바구니 삭제 버튼이 렌더링될 위치 */}
+    {children && (
+      <div style={{ marginLeft: "auto", display: "flex", alignItems: "center" }}>
+        {children}
+      </div>
+    )}
   </ProductItemWrapper>
 );
 
-// 2. 주문 상태 요약
+// ... OrderSummary, MySidebarMenu, MySection 코드는 동일 (생략 가능하나 유지함) ...
 const OrderSummary: React.FC = () => {
   const statuses = [
     { label: "결제진행 / 완료", count: 0 },
@@ -77,7 +81,6 @@ const OrderSummary: React.FC = () => {
     { label: "배송중", count: 0 },
     { label: "배송완료", count: 0 },
   ];
-
   return (
     <OrderSummaryContainer>
       {statuses.map((s) => (
@@ -90,21 +93,15 @@ const OrderSummary: React.FC = () => {
   );
 };
 
-// 3. 마이 메뉴 (사이드바)
 const MySidebarMenu: React.FC = () => {
   const { activeSection, setActiveSection } = useMyPage();
   const { userEmail } = useAuth();
-
-  const menuItems: {
-    label: string;
-    key: "favorites" | "cart" | "history" | "inquiry";
-  }[] = [
-    { label: "MY", key: "favorites" }, // MY 대신 '작품 찜'으로 대체 (이미지 기반)
+  const menuItems: { label: string; key: "favorites" | "cart" | "history" | "inquiry"; }[] = [
+    { label: "MY", key: "favorites" },
     { label: "카트", key: "cart" },
     { label: "구매이력", key: "history" },
     { label: "문의사항", key: "inquiry" },
   ];
-
   return (
     <>
       <AccountInfoBox>
@@ -114,7 +111,6 @@ const MySidebarMenu: React.FC = () => {
         <Button>비밀번호 변경</Button>
         <Button>회원 탈퇴</Button>
       </AccountInfoBox>
-
       <MyMenu>
         {menuItems.map((item) => (
           <MenuItem
@@ -131,12 +127,6 @@ const MySidebarMenu: React.FC = () => {
   );
 };
 
-// 4. 공통 섹션 컴포넌트
-interface SectionProps {
-  title: string;
-  children: ReactNode;
-}
-
 const MySection: React.FC<SectionProps> = ({ title, children }) => (
   <SectionWrapper>
     <SectionHeader>
@@ -147,25 +137,18 @@ const MySection: React.FC<SectionProps> = ({ title, children }) => (
   </SectionWrapper>
 );
 
-// --- Compound Component 구성 ---
+interface SectionProps { title: string; children: ReactNode; }
+interface MyPageLayoutProps { children: ReactNode; }
 
-interface MyPageLayoutProps {
-  children: ReactNode;
-}
+const MyPageLayoutBase: React.FC<MyPageLayoutProps> = ({ children }) => (
+  <MyPageProvider>
+    <LayoutContainer>{children}</LayoutContainer>
+  </MyPageProvider>
+);
 
-// Base Component: Context를 제공하고 레이아웃을 정의
-const MyPageLayoutBase: React.FC<MyPageLayoutProps> = ({ children }) => {
-  return (
-    <MyPageProvider>
-      <LayoutContainer>{children}</LayoutContainer>
-    </MyPageProvider>
-  );
-};
-
-// 하위 컴포넌트들을 Base에 연결
 export const MyPage = Object.assign(MyPageLayoutBase, {
   Sidebar: MySidebarMenu,
-  Content: ContentContainer, // 콘텐츠 영역의 레이아웃 컨테이너
+  Content: ContentContainer,
   Order: OrderSummary,
   Section: MySection,
   Product: ProductItem,

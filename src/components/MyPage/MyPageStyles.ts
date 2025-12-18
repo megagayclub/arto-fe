@@ -3,7 +3,7 @@ import styled, { css } from "styled-components";
 
 // --- 기본 레이아웃 ---
 export const LayoutContainer = styled.div`
-  max-width: 1000px;
+  max-width: 900px;
   margin: 50px auto;
   padding: 0 20px;
   display: flex;
@@ -107,7 +107,7 @@ export const TopDashboard = styled.div`
 `;
 
 export const InfoCard = styled.div`
-  background: #f4f4f4; /* 회색 섹션 */
+  background: #202020ff; /* 회색 섹션 */
   padding: 20px;
   border-radius: 4px;
   display: flex;
@@ -116,7 +116,7 @@ export const InfoCard = styled.div`
 
   h3 {
     font-size: 14px;
-    color: #666;
+    color: #ffffffff;
     margin-bottom: 15px;
     border-bottom: 1px solid #ddd;
     padding-bottom: 5px;
@@ -125,7 +125,7 @@ export const InfoCard = styled.div`
   .content {
     font-size: 18px;
     font-weight: bold;
-    color: #333;
+    color: #ccccccff;
   }
 `;
 
@@ -135,6 +135,8 @@ export const OrderSummaryContainer = styled.div`
   background: #f4f4f4; /* 회색 섹션 */
   border-radius: 4px;
   flex-grow: 1;
+  justify-content: center;
+  align-items: center;
 `;
 
 export const StatusItem = styled.div`
