@@ -10,6 +10,13 @@ export interface OrderHistoryItem {
   totalAmount: number | string; // BigDecimal이 string/number로 올 수 있어서 안전 처리
   orderDate: string;            // LocalDate -> "YYYY-MM-DD"
   orderStatus: string;          // "PENDING" | "SHIPPED" ...
+
+  // ✅ 결제 정보 (A안: 없어도 주문은 보이므로 optional/null 허용)
+  paymentId?: number | null;
+  paymentStatus?: "PENDING" | "CONFIRMED" | null;
+  paymentMethod?: "CARD" | "BANK_TRANSFER" | "VIRTUAL_ACCOUNT" | null;
+  paymentDate?: string | null;      // LocalDateTime -> "YYYY-MM-DDTHH:mm:ss..."
+  transactionId?: string | null;
 }
 
 export const useMyOrders = () => {
