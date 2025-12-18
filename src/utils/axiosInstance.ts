@@ -3,7 +3,7 @@ import axios from "axios";
 
 const axiosInstance = axios.create({
   // baseURL: "/api", (기존)
-  baseURL: "http://[파트너의-EC2-IP]:8080/api", // 실제 서버 주소
+  baseURL: "http://http://52.79.193.77:8080/api", // 실제 서버 주소
   headers: {
     "Content-Type": "application/json",
   },
