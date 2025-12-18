@@ -4,7 +4,7 @@ import { useState } from 'react';
 import axios from 'axios';
 // ⚠️ AuthContext가 외부 파일에 있다고 가정하고 import합니다.
 //    (예: src/context/AuthContext.tsx)
-import { useAuth } from '../context/AuthContext'; 
+import { useAuth } from '../context/AuthContext';
 
 // --- 타입 정의 (API 요청/응답) ---
 interface LoginRequest {
@@ -18,7 +18,7 @@ interface LoginResponse {
 }
 
 // 백엔드 API의 기본 URL (실제 환경에 맞게 변경 필요)
-const BASE_URL = 'http://localhost:8080/api/v1'; 
+const BASE_URL = 'http://52.79.193.77:8080/api/v1'; 
 const LOGIN_URL = `${BASE_URL}/login`;
 
 // --- 커스텀 훅 정의 ---
