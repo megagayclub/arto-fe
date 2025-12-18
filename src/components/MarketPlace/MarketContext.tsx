@@ -19,6 +19,7 @@ export interface FilterStateType {
   morph: string | null;
   color: number | null;
   ship: string[];
+  sort: string | null;
 }
 
 interface MarketContextType {

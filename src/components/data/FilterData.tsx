@@ -78,3 +78,10 @@ export const COLOR_OPTIONS = [
   { hex: "#40E0D0", name: "Turquoise", value: 14 },
   { hex: "#FFD700", name: "Gold", value: 15 },
 ];
+
+// src/data/FilterData.ts 또는 MarketFilter.tsx 상단
+export const SORT_OPTIONS: { label: string; value: string }[] = [
+  { label: "최신순", value: "LATEST" },      // 백엔드: LATEST
+  { label: "가격 낮은순", value: "PRICE_ASC" }, // 백엔드: PRICE_ASC
+  { label: "가격 높은순", value: "PRICE_DESC" }, // 백엔드: PRICE_DESC
+];

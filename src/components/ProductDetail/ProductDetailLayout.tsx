@@ -108,7 +108,7 @@ export const ProductDetailLayout: React.FC = () => {
       <MainContent>
         {/* 2-1. 이미지 영역 */}
         <ImageArea>
-          <img src={product.imagePlaceholder} alt={product.title} />
+          <img src={product.thumbnailImageUrl} alt={product.title} />
           <p style={{ marginTop: "20px", fontSize: "12px", color: "#666" }}>
             ©{product.year} {product.artist}. All rights reserved. 작품 이미지의 무단
             사용 및 전재를 금합니다.
