@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 
 interface InquiryRequest {
   artworkId: number;
@@ -21,7 +21,7 @@ export const useInquiry = () => {
 
     try {
       // 2. 백엔드 주소로 요청 (프록시가 없다면 http://localhost:8080 추가)
-      await axios.post("http://localhost:8080/api/v1/inquiries", data, {
+      await axiosInstance .post("http://localhost:8080/api/v1/inquiries", data, {
         headers: {
           "Content-Type": "application/json",
           // 3. 토큰이 있으면 헤더에 넣어줌

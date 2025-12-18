@@ -61,7 +61,8 @@ const PurchaseHistoryContent: React.FC = () => {
           key={o.orderId}
           id={o.orderId}
           title={`${o.artworkTitle} (${o.orderStatus})`}
-          date={o.orderDate} // ✅ 주문일 표시 (작품등록일 대신)
+          dateLabel="구매일"
+          date={o.orderDate}
           price={Number.isFinite(toNumber(o.totalAmount)) ? toNumber(o.totalAmount) : undefined}
           image={o.thumbnailUrl ?? undefined}
         />
@@ -128,7 +129,7 @@ export const MyPageLayout: React.FC = () => {
                   key={item.wishlistId}
                   id={item.artworkId}
                   title={item.title}
-                  date={new Date(item.addedAt).toLocaleDateString()}
+                  // date={new Date(item.addedAt).toLocaleDateString()}
                   price={item.price}
                   image={item.thumbnailImageUrl}
                 />
@@ -158,7 +159,7 @@ export const MyPageLayout: React.FC = () => {
                   key={item.cartItemId}
                   id={item.artworkId}
                   title={item.title}
-                  date={"-"} // ✅ CartResponse에 날짜 필드가 없어서 표시 불가
+                  // date={"-"} // ✅ CartResponse에 날짜 필드가 없어서 표시 불가
                   price={Number(item.price)}
                   image={item.thumbnailImageUrl}
                 />
@@ -199,9 +200,11 @@ export const MyPageLayout: React.FC = () => {
                 <MyPage.Product
                   key={q.inquiryId}
                   id={q.inquiryId}
+                  titleLabel="문의제목"
                   title={q.title}
+                  dateLabel="문의일"
                   date={new Date(q.createdAt).toLocaleDateString()}
-                  // ✅ 문의는 price/image 없음 (MyPage.Product가 optional 처리돼 있어야 함)
+                  hideImage={true} 
                 />
               ))}
           </MyPage.Section>
