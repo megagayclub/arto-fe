@@ -12,6 +12,9 @@ import { useMyWishlist } from "../../hooks/useMyWishlist";
 // 🔹 장바구니 API 훅
 import { useMyCart } from "../../hooks/useMyCart";
 
+// 🔹 구매(주문) 이력 API 훅 ✅ 추가
+import { useMyOrders } from "../../hooks/useMyOrders";
+
 // 🔹 문의 내역 API 훅 ✅ 추가
 import { useMyInquiries } from "../../hooks/useMyInquiries";
 
@@ -22,15 +25,50 @@ const PageWrapper = styled.div`
   background-color: #fff;
 `;
 
-// (더미) 구매 이력
-const PurchaseHistoryContent: React.FC = () => (
-  <div style={{ textAlign: "center", padding: "30px 0", color: "#999" }}>
-    <p>구매 이력이 없습니다.</p>
-    <p style={{ fontSize: "12px", marginTop: "10px" }}>
-      Artisry의 멋진 작품을 컬렉션 해보세요!
-    </p>
-  </div>
-);
+// ✅ 구매(주문) 이력 (API 연동)
+const PurchaseHistoryContent: React.FC = () => {
+  const { orders, isLoading, error } = useMyOrders();
+
+  if (isLoading) {
+    return <p>구매(주문) 이력 불러오는 중...</p>;
+  }
+
+  if (error) {
+    return (
+      <p style={{ color: "red" }}>
+        구매(주문) 이력을 불러오는 중 오류가 발생했습니다: {error}
+      </p>
+    );
+  }
+
+  if (!orders || orders.length === 0) {
+    return (
+      <div style={{ textAlign: "center", padding: "30px 0", color: "#999" }}>
+        <p>구매 이력이 없습니다.</p>
+        <p style={{ fontSize: "12px", marginTop: "10px" }}>
+          Artisry의 멋진 작품을 컬렉션 해보세요!
+        </p>
+      </div>
+    );
+  }
+
+  const toNumber = (v: any) => (typeof v === "number" ? v : Number(v));
+
+  return (
+    <>
+      {orders.map((o) => (
+        <MyPage.Product
+          key={o.orderId}
+          id={o.orderId}
+          title={`${o.artworkTitle} (${o.orderStatus})`}
+          date={o.orderDate} // ✅ 주문일 표시 (작품등록일 대신)
+          price={Number.isFinite(toNumber(o.totalAmount)) ? toNumber(o.totalAmount) : undefined}
+          image={o.thumbnailUrl ?? undefined}
+        />
+      ))}
+    </>
+  );
+};
 
 
 export const MyPageLayout: React.FC = () => {
@@ -133,7 +171,7 @@ export const MyPageLayout: React.FC = () => {
             )}
           </MyPage.Section>
 
-          {/* 2-4. 구매 이력 섹션 (더미) */}
+          {/* 2-4. 구매 이력 섹션 (API 연동) */}
           <MyPage.Section title="구매 이력">
             <PurchaseHistoryContent />
           </MyPage.Section>
