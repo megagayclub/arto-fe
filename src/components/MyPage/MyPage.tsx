@@ -25,18 +25,45 @@ import {
 interface ProductProps {
   id: number;
   title: string;
-  date: string;
-  price: number;
-  image: string;
+  titleLabel?: string;    // ✅ 추가 (기본: 작품명)
+  date?: string;          // ✅ optional로 변경
+  dateLabel?: string;     // ✅ 라벨 커스터마이징
+  price?: number;   // ✅ optional
+  image?: string;   // ✅ optional
+
+  hideImage?: boolean; // ✅ 추가
 }
 
-const ProductItem: React.FC<ProductProps> = ({ title, date, price }) => (
+const ProductItem: React.FC<ProductProps> = ({
+  title,
+  titleLabel,
+  date,
+  dateLabel,
+  price,
+  image,
+  hideImage,
+}) => (
   <ProductItemWrapper>
-    <ProductImage />
+    {/* ✅ 문의 섹션에서는 이미지 영역 자체를 제거 */}
+    {!hideImage && (
+      <ProductImage>
+        {image && (
+          <img
+            src={image}
+            alt={title}
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          />
+        )}
+      </ProductImage>
+    )}
+
     <ProductInfo>
-      <p>작품등록일: {date}</p>
-      <p>작품명: {title}</p>
-      <span>가격: {price.toLocaleString()}₩</span>
+      {date && <p>{dateLabel ?? "작품등록일"}: {date}</p>}
+      <p>{titleLabel ?? "작품명"}: {title}</p>
+
+      {typeof price === "number" && (
+        <span>가격: {price.toLocaleString()}₩</span>
+      )}
     </ProductInfo>
   </ProductItemWrapper>
 );
