@@ -31,7 +31,7 @@ interface MarketContextType {
   setCurrentPage: (page: number) => void;
   filters: FilterStateType;
   setFilters: React.Dispatch<React.SetStateAction<FilterStateType>>;
-  applyFilters: () => void;
+  applyFilters: (overrideFilters?: FilterStateType) => void;
   resetFilters: () => void;
 }
 
@@ -48,6 +48,7 @@ export const initialFilters: FilterStateType = {
   morph: null,
   color: null,
   ship: [],
+  sort: null
 };
 
 const BASE_URL = "http://localhost:8080/api/v1/artworks";
@@ -93,7 +94,9 @@ export const MarketProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     if (currentFilters.ship && currentFilters.ship.length > 0) {
       currentFilters.ship.forEach(s => params.append("shippingMethods", s));
     }
-
+    if (currentFilters.sort) {
+      params.append("sort", currentFilters.sort);
+    }
     // 디버깅용: 실제 호출되는 URL 확인
     console.log("Request URL:", `${BASE_URL}?${params.toString()}`);
 
@@ -120,9 +123,9 @@ useEffect(() => {
 }, [currentPage]); 
 
 // FilterSidebar의 적용 버튼에서 호출할 함수
-const applyFilters = () => {
-  setCurrentPage(1); // 필터 적용 시 1페이지로 이동
-  fetchProducts(filters);
+const applyFilters = (overrideFilters?: FilterStateType) => {
+  setCurrentPage(1);
+  fetchProducts(overrideFilters || filters); // 인자가 있으면 그것을 사용
 };
 
   const resetFilters = () => setFilters(initialFilters);
