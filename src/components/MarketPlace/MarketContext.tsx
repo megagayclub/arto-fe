@@ -3,9 +3,9 @@ import axios from "axios";
 
 // 1. 상품 데이터 타입
 interface Product {
-  id: number;
+  artworkId: number;
   title: string;
-  artist: string;
+  artistName: string;
   price: number;
   thumbnailImageUrl : string;
 }

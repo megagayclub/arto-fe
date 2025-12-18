@@ -1,8 +1,9 @@
 import React from "react";
 import styled from "styled-components";
 import { useMarket } from "./MarketContext";
+import { useNavigate } from "react-router-dom";
 
-// --- 스타일 수정 (기존과 동일) ---
+// --- 스타일 (기존 디자인 100% 유지) ---
 
 const ListGrid = styled.div`
   display: flex;
@@ -20,10 +21,9 @@ const ItemCard = styled.div`
   border: 1px solid #ddd;
   flex: 0 0 calc(25% - 15px);
   max-width: 200px;
-  padding: 15px;
-  text-align: center;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   transition: transform 0.2s;
+  cursor: pointer; /* 마우스 커서 변경 확인 */
 
   &:hover {
     transform: translateY(-5px);
@@ -32,55 +32,64 @@ const ItemCard = styled.div`
 
   img {
     width: 100%;
-    height: 200px;
+    height: 250px;
     object-fit: cover;
     margin-bottom: 10px;
+    pointer-events: none; /* 이미지 클릭 방해 금지 */
+  }
+
+  h3, p, strong {
+    pointer-events: none; /* 텍스트 클릭 방해 금지 */
   }
 
   h3 {
     font-size: 1.1em;
     margin: 5px 0;
     color: #333;
+    padding-left: 10px;
   }
 
   p {
     font-size: 0.9em;
     color: #666;
     margin: 5px 0;
+    padding-left: 10px;
   }
 
   strong {
     display: block;
-    color: #a00;
-    font-size: 1.2em;
-    margin-top: 10px;
+    color: rgba(182, 182, 182, 1);
+    font-size: 0.75em;
+    margin-bottom: 15px;
+    padding-left: 10px;
   }
 `;
 
-// --- 컴포넌트 수정 ---
-
-// 개별 상품 아이템 컴포넌트
-const ProductItem: React.FC<{ product: any }> = ({ product }) => (
-  <ItemCard>
-    <img src={product.thumbnailImageUrl} alt={product.title} />
-    <h3>{product.title}</h3>
-    <p>Artist: {product.artist}</p>
-    <strong>₩{product.price.toLocaleString()}</strong>
-  </ItemCard>
-);
+// --- 컴포넌트 ---
 
 export const ProductList: React.FC = () => {
   const { products } = useMarket();
+  const navigate = useNavigate();
+
+  // 클릭 핸들러를 부모에서 관리
+  const handleItemClick = (id: number | string) => {
+    console.log("클릭된 ID:", id); // 브라우저 콘솔에서 작동 여부 확인용
+    navigate(`/product/${id}`);
+  };
 
   return (
     <ListGrid>
       {products && products.length > 0 ? (
         products.map((product, index) => (
-          /* 해결책: product.id가 확실히 고유한지 확인하세요. 
-             만약 API에서 중복된 ID를 준다면 `${product.id}-${index}` 처럼 조합할 수 있습니다.
-             하지만 가장 좋은 방법은 데이터 소스(MarketContext)의 id를 고유하게 만드는 것입니다.
-          */
-          <ProductItem key={product.id || index} product={product} />
+          <ItemCard 
+            key={product.artworkId || index} 
+            onClick={() => handleItemClick(product.artworkId)}
+          >
+            <img src={product.thumbnailImageUrl} alt={product.title} />
+            <h3>{product.title}</h3>
+            <p>{product.artistName}</p>
+            <strong>₩{product.price.toLocaleString()}</strong>
+          </ItemCard>
         ))
       ) : (
         <p>No products found.</p>
