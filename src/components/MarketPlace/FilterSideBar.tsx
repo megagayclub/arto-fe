@@ -6,13 +6,13 @@ import {
   MOOD_OPTIONS,
   COLOR_OPTIONS,
   ETC_OPTIONS,
-  SHAPE_OPTIONS,
+  MORPH_OPTIONS,
 } from "../data/FilterData";
 import { 
   useMarket, 
   MAX_PRICE, 
   MAX_SIZE, 
-  FilterStateType 
+  FilterStateType
 } from "./MarketContext";
 
 // --- 스타일 정의 ---
@@ -251,10 +251,10 @@ const RangeInputBase = styled.input.attrs({ type: "range" })`
 
 export const FilterSidebar: React.FC = () => {
   // MarketContext 연동
-  const { filters, setFilters, resetFilters } = useMarket();
+  const { filters, setFilters, resetFilters,applyFilters } = useMarket();
   
   const [isPanelOpen, setIsPanelOpen] = useState(false);
-  const [activeIcon, setActiveIcon] = useState<string | null>("home");
+  const [activeIcon, setActiveIcon] = useState<string | null>("space");
 
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
   const panelRef = useRef<HTMLDivElement>(null);
@@ -268,30 +268,57 @@ export const FilterSidebar: React.FC = () => {
 
   // 아이콘 네비게이션 내 현재 선택된 값 텍스트 표시
   const renderIconContent = (item: { id: string; icon: React.ReactNode }) => {
-    const selectedValue = filters[item.id as keyof FilterStateType];
+  // 현재 필터에서 해당 아이디의 값을 가져옴
+  const selectedValue = filters[item.id as keyof FilterStateType];
 
-    if (item.id === "home" && selectedValue) return <SelectedText>{selectedValue}</SelectedText>;
-    if (item.id === "light" && selectedValue) return <SelectedText>{selectedValue}</SelectedText>;
-    
-    if (item.id === "won") {
-      if (filters.won[0] === 0 && filters.won[1] === MAX_PRICE) return item.icon;
-      return <SelectedText>{formatPriceLabel(filters.won[0])}~{formatPriceLabel(filters.won[1])}</SelectedText>;
-    }
-    
-    if (item.id === "size") {
-      if (filters.size[0] === 0 && filters.size[1] === MAX_SIZE) return item.icon;
-      return <SelectedText>{filters.size[0]}~{filters.size[1]}cm</SelectedText>;
-    }
+  // 1. 공간 (space)
+  if (item.id === "space" && selectedValue) {
+    const target = SPACE_OPTIONS.find((o) => o.value === selectedValue);
+    return <SelectedText>{target?.label || "공간"}</SelectedText>;
+  }
 
-    if (item.id === "shape" && selectedValue) return <SelectedText>{selectedValue}</SelectedText>;
-    if (item.id === "color" && selectedValue) {
-        const colorName = COLOR_OPTIONS.find(c => c.hex === filters.color)?.name;
-        return <SelectedText>{colorName || "색상"}</SelectedText>;
-    }
-    if (item.id === "ship" && filters.ship.length > 0) return <SelectedText>{filters.ship[0]}</SelectedText>;
+  // 2. 분위기 (mood)
+  if (item.id === "mood" && filters.mood) { // nav 아이디가 'light'라면 filters.mood 참조
+    const target = MOOD_OPTIONS.find((o) => o.value === filters.mood);
+    return <SelectedText>{target?.label || "분위기"}</SelectedText>;
+  }
 
-    return item.icon;
-  };
+  // 3. 가격 (won)
+  if (item.id === "won") {
+    if (filters.won[0] === 0 && filters.won[1] === MAX_PRICE) return item.icon;
+    return (
+      <SelectedText>
+        {formatPriceLabel(filters.won[0])}~{formatPriceLabel(filters.won[1])}
+      </SelectedText>
+    );
+  }
+
+  // 4. 크기 (size)
+  if (item.id === "size") {
+    if (filters.size[0] === 0 && filters.size[1] === MAX_SIZE) return item.icon;
+    return <SelectedText>{filters.size[0]}~{filters.size[1]}cm</SelectedText>;
+  }
+
+  // 5. 형태 (morph)
+  if (item.id === "morph" && filters.morph) { // nav 아이디가 'shape'라면 filters.morph 참조
+    const target = MORPH_OPTIONS.find((o) => o.value === filters.morph);
+    return <SelectedText>{target?.label || "형태"}</SelectedText>;
+  }
+
+  // 6. 색상 (color)
+  if (item.id === "color" && selectedValue) {
+    const target = COLOR_OPTIONS.find((c) => c.value === selectedValue);
+    return <SelectedText>{target?.name || "색상"}</SelectedText>; // name 또는 label 사용
+  }
+
+  // 7. 기타/배송 (ship)
+  if (item.id === "ship" && filters.ship.length > 0) {
+    const target = ETC_OPTIONS.find((o) => o.value === filters.ship[0]);
+    return <SelectedText>{target?.label || filters.ship[0]}</SelectedText>;
+  }
+
+  return item.icon;
+};
 
   // 기타(etc) 다중 선택 토글 핸들러
   const handleEtcToggle = (option: string) => {
@@ -326,10 +353,10 @@ export const FilterSidebar: React.FC = () => {
     // 1. URLSearchParams를 사용하여 파라미터 문자열 생성
     const params = new URLSearchParams();
     
-    if (filters.home) params.append("space", filters.home);
-    if (filters.light) params.append("mood", filters.light);
-    if (filters.shape) params.append("shape", filters.shape);
-    if (filters.color) params.append("color", filters.color);
+    if (filters.space) params.append("spaces", filters.space.toString());
+    if (filters.mood) params.append("moods", filters.mood.toString());
+    if (filters.morph) params.append("morph", filters.morph);
+    if (filters.color) params.append("colors", filters.color.toString());
     
     // 가격 및 크기 범위
     params.append("minPrice", filters.won[0].toString());
@@ -344,7 +371,8 @@ export const FilterSidebar: React.FC = () => {
 
     // 2. 알림창으로 파라미터 출력
     alert(`백엔드로 전송될 파라미터:\n?${params.toString()}`);
-    
+    applyFilters(); // Context에서 가져온 함수 실행
+
     // 3. 패널 닫기
     setIsPanelOpen(false);
   };
@@ -399,25 +427,37 @@ export const FilterSidebar: React.FC = () => {
         <div style={{ flexGrow: 1, paddingRight: "5px" }}>
           <hr style={{ margin: "15px 0" }} />
 
-          {/* 공간(Home) 섹션 */}
-          <FilterSection $isCurrent={activeIcon === "home"} ref={(el) => (sectionRefs.current["home"] = el)}>
-            <FilterSectionTitle>공간</FilterSectionTitle>
-            <OptionList>
-              {SPACE_OPTIONS.map((o) => (
-                <OptionButton key={o} $isActive={filters.home === o} onClick={() => setFilters(p => ({ ...p, home: o }))}>{o}</OptionButton>
-              ))}
-            </OptionList>
-          </FilterSection>
+          {/* 공간(space) 섹션 */}
+<FilterSection $isCurrent={activeIcon === "space"} ref={(el) => (sectionRefs.current["space"] = el)}>
+  <FilterSectionTitle>공간</FilterSectionTitle>
+  <OptionList>
+    {SPACE_OPTIONS.map((o) => (
+      <OptionButton 
+        key={o.value} 
+        $isActive={filters.space === o.value} 
+        onClick={() => setFilters(p => ({ ...p, space: o.value }))}
+      >
+        {o.label}
+      </OptionButton>
+    ))}
+  </OptionList>
+</FilterSection>
 
-          {/* 분위기(Light/Mood) 섹션 */}
-          <FilterSection $isCurrent={activeIcon === "light"} ref={(el) => (sectionRefs.current["light"] = el)}>
-            <FilterSectionTitle>분위기</FilterSectionTitle>
-            <OptionList>
-              {MOOD_OPTIONS.map((o) => (
-                <OptionButton key={o} $isActive={filters.light === o} onClick={() => setFilters(p => ({ ...p, light: o }))}>{o}</OptionButton>
-              ))}
-            </OptionList>
-          </FilterSection>
+{/* 분위기(mood/Mood) 섹션 */}
+<FilterSection $isCurrent={activeIcon === "mood"} ref={(el) => (sectionRefs.current["mood"] = el)}>
+  <FilterSectionTitle>분위기</FilterSectionTitle>
+  <OptionList>
+    {MOOD_OPTIONS.map((o) => (
+      <OptionButton 
+        key={o.value} 
+        $isActive={filters.mood === o.value} 
+        onClick={() => setFilters(p => ({ ...p, mood: o.value }))}
+      >
+        {o.label}
+      </OptionButton>
+    ))}
+  </OptionList>
+</FilterSection>
 
           {/* 가격(Won) 섹션 */}
           <FilterSection $isCurrent={activeIcon === "won"} ref={(el) => (sectionRefs.current["won"] = el)}>
@@ -449,12 +489,12 @@ export const FilterSidebar: React.FC = () => {
             </MultiRangeContainer>
           </FilterSection>
 
-          {/* 형태(Shape) 섹션 */}
-          <FilterSection $isCurrent={activeIcon === "shape"} ref={(el) => (sectionRefs.current["shape"] = el)}>
+          {/* 형태(morph) 섹션 */}
+          <FilterSection $isCurrent={activeIcon === "morph"} ref={(el) => (sectionRefs.current["morph"] = el)}>
             <FilterSectionTitle>형태</FilterSectionTitle>
             <OptionList>
-              {SHAPE_OPTIONS.map((s) => (
-                <OptionButton key={s} $isActive={filters.shape === s} onClick={() => setFilters(p => ({ ...p, shape: s }))}>{s}</OptionButton>
+              {MORPH_OPTIONS.map((m: { label: string; value: string }) => (
+                <OptionButton key={m.value} $isActive={filters.morph === m.value} onClick={() => setFilters(p => ({ ...p, morph: m.value }))}>{m.label}</OptionButton>
               ))}
             </OptionList>
           </FilterSection>
@@ -464,7 +504,7 @@ export const FilterSidebar: React.FC = () => {
             <FilterSectionTitle>색상</FilterSectionTitle>
             <OptionList>
               {COLOR_OPTIONS.map((c) => (
-                <ColorOption key={c.hex} hex={c.hex} $isSelected={filters.color === c.hex} onClick={() => setFilters(p => ({ ...p, color: c.hex }))} title={c.name} />
+                <ColorOption key={c.hex} hex={c.hex} $isSelected={filters.color === c.value} onClick={() => setFilters(p => ({ ...p, color: c.value }))} title={c.name} />
               ))}
             </OptionList>
           </FilterSection>
@@ -474,7 +514,7 @@ export const FilterSidebar: React.FC = () => {
             <FilterSectionTitle>기타</FilterSectionTitle>
             <OptionList>
               {ETC_OPTIONS.map((o) => (
-                <OptionButton key={o} $isActive={filters.ship.includes(o)} onClick={() => handleEtcToggle(o)}>{o}</OptionButton>
+                <OptionButton key={o.value} $isActive={filters.ship.includes(o.value)} onClick={() => handleEtcToggle(o.value)}>{o.label}</OptionButton>
               ))}
             </OptionList>
           </FilterSection>

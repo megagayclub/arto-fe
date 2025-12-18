@@ -62,7 +62,7 @@ const ItemCard = styled.div`
 // 개별 상품 아이템 컴포넌트
 const ProductItem: React.FC<{ product: any }> = ({ product }) => (
   <ItemCard>
-    <img src={product.image} alt={product.title} />
+    <img src={product.thumbnailImageUrl} alt={product.title} />
     <h3>{product.title}</h3>
     <p>Artist: {product.artist}</p>
     <strong>₩{product.price.toLocaleString()}</strong>
