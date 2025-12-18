@@ -11,7 +11,6 @@ const MarketPlacePage: React.FC = () => {
     // 🌟 [수정] MarketProvider로 필터와 레이아웃 컴포넌트를 감싸줍니다.
     <MarketProvider>
       <Header />
-      <FilterSidebar />
       <MarketLayout>
         <MarketLayout.Filter />
         <MarketLayout.List />

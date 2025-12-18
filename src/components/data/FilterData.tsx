@@ -60,7 +60,7 @@ export const SHAPE_OPTIONS: string[] = [
   "기타",
 ];
 export const COLOR_OPTIONS: { hex: string; name: string }[] = [
-  { hex: "#FF0000", name: "Red" },
+  { hex: "#FF0000", name: "red" },
   { hex: "#FF8000", name: "Orange" },
   { hex: "#FFFF00", name: "Yellow" },
   { hex: "#008000", name: "Green" },

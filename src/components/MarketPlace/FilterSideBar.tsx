@@ -8,30 +8,12 @@ import {
   ETC_OPTIONS,
   SHAPE_OPTIONS,
 } from "../data/FilterData";
-
-// --- 필터 상태 타입 정의 ---
-interface FilterStateType {
-  home: string | null;
-  light: string | null;
-  won: [number, number];
-  size: [number, number];
-  shape: string | null;
-  color: string | null;
-  ship: string[];
-}
-
-const MAX_PRICE = 20000000; // 최대 가격 2,000만 원
-const MAX_SIZE = 500;
-
-const initialFilters: FilterStateType = {
-  home: null,
-  light: null,
-  won: [0, MAX_PRICE], 
-  size: [0, MAX_SIZE],    
-  shape: null,
-  color: null,
-  ship: [],
-};
+import { 
+  useMarket, 
+  MAX_PRICE, 
+  MAX_SIZE, 
+  FilterStateType 
+} from "./MarketContext";
 
 // --- 스타일 정의 ---
 
@@ -186,6 +168,7 @@ const FooterButtons = styled.div`
   gap: 15px;
   padding-top: 20px;
   border-top: 1px solid #ddd;
+  background-color: #f7f7f7;
 `;
 
 const ResetButton = styled.button`
@@ -267,20 +250,23 @@ const RangeInputBase = styled.input.attrs({ type: "range" })`
 // --- 컴포넌트 구현 ---
 
 export const FilterSidebar: React.FC = () => {
+  // MarketContext 연동
+  const { filters, setFilters, resetFilters } = useMarket();
+  
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [activeIcon, setActiveIcon] = useState<string | null>("home");
-  const [filters, setFilters] = useState<FilterStateType>(initialFilters);
 
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
   const panelRef = useRef<HTMLDivElement>(null);
 
-  // 🌟 가격 포맷: '천' 단위 제거하고 숫자만 (예: 1500만)
+  // 가격 포맷: '만' 단위로 표시
   const formatPriceLabel = (price: number) => {
     if (price === 0) return "0원";
     const tenThousand = Math.floor(price / 10000);
     return `${tenThousand}만`;
   };
 
+  // 아이콘 네비게이션 내 현재 선택된 값 텍스트 표시
   const renderIconContent = (item: { id: string; icon: React.ReactNode }) => {
     const selectedValue = filters[item.id as keyof FilterStateType];
 
@@ -307,16 +293,21 @@ export const FilterSidebar: React.FC = () => {
     return item.icon;
   };
 
+  // 기타(etc) 다중 선택 토글 핸들러
   const handleEtcToggle = (option: string) => {
     setFilters((prev) => {
       const isSelected = prev.ship.includes(option);
-      return { ...prev, ship: isSelected ? prev.ship.filter(i => i !== option) : [...prev.ship, option] };
+      return { 
+        ...prev, 
+        ship: isSelected ? prev.ship.filter(i => i !== option) : [...prev.ship, option] 
+      };
     });
   };
 
+  // 사이드바 아이콘 클릭 핸들러
   const handleIconClick = (id: string) => {
     if (id === "reset") {
-      setFilters(initialFilters);
+      resetFilters();
       if (panelRef.current) panelRef.current.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
@@ -331,6 +322,34 @@ export const FilterSidebar: React.FC = () => {
 
   const handleClose = () => setIsPanelOpen(false);
 
+  const handleApply = () => {
+    // 1. URLSearchParams를 사용하여 파라미터 문자열 생성
+    const params = new URLSearchParams();
+    
+    if (filters.home) params.append("space", filters.home);
+    if (filters.light) params.append("mood", filters.light);
+    if (filters.shape) params.append("shape", filters.shape);
+    if (filters.color) params.append("color", filters.color);
+    
+    // 가격 및 크기 범위
+    params.append("minPrice", filters.won[0].toString());
+    params.append("maxPrice", filters.won[1].toString());
+    params.append("minSize", filters.size[0].toString());
+    params.append("maxSize", filters.size[1].toString());
+
+    // 기타 (배열)
+    if (filters.ship.length > 0) {
+      filters.ship.forEach(s => params.append("etc", s));
+    }
+
+    // 2. 알림창으로 파라미터 출력
+    alert(`백엔드로 전송될 파라미터:\n?${params.toString()}`);
+    
+    // 3. 패널 닫기
+    setIsPanelOpen(false);
+  };
+
+  // 가격/크기 슬라이더 핸들러
   const handleRangeChange = (field: 'won' | 'size', index: 0 | 1, value: number, maxLimit: number) => {
     setFilters(prev => {
       const newRange = [...prev[field]] as [number, number];
@@ -344,6 +363,7 @@ export const FilterSidebar: React.FC = () => {
     });
   };
 
+  // 패널 스크롤 시 활성화된 섹션 아이콘 하이라이트
   useEffect(() => {
     const panel = panelRef.current;
     if (!panel) return;
@@ -379,6 +399,7 @@ export const FilterSidebar: React.FC = () => {
         <div style={{ flexGrow: 1, paddingRight: "5px" }}>
           <hr style={{ margin: "15px 0" }} />
 
+          {/* 공간(Home) 섹션 */}
           <FilterSection $isCurrent={activeIcon === "home"} ref={(el) => (sectionRefs.current["home"] = el)}>
             <FilterSectionTitle>공간</FilterSectionTitle>
             <OptionList>
@@ -388,6 +409,7 @@ export const FilterSidebar: React.FC = () => {
             </OptionList>
           </FilterSection>
 
+          {/* 분위기(Light/Mood) 섹션 */}
           <FilterSection $isCurrent={activeIcon === "light"} ref={(el) => (sectionRefs.current["light"] = el)}>
             <FilterSectionTitle>분위기</FilterSectionTitle>
             <OptionList>
@@ -397,6 +419,7 @@ export const FilterSidebar: React.FC = () => {
             </OptionList>
           </FilterSection>
 
+          {/* 가격(Won) 섹션 */}
           <FilterSection $isCurrent={activeIcon === "won"} ref={(el) => (sectionRefs.current["won"] = el)}>
             <FilterSectionTitle>가격</FilterSectionTitle>
             <RangeLabelGroup>
@@ -411,6 +434,7 @@ export const FilterSidebar: React.FC = () => {
             </MultiRangeContainer>
           </FilterSection>
 
+          {/* 크기(Size) 섹션 */}
           <FilterSection $isCurrent={activeIcon === "size"} ref={(el) => (sectionRefs.current["size"] = el)}>
             <FilterSectionTitle>크기</FilterSectionTitle>
             <RangeLabelGroup>
@@ -420,11 +444,12 @@ export const FilterSidebar: React.FC = () => {
             <MultiRangeContainer>
               <SliderTrack />
               <ActiveTrack $start={(filters.size[0] / MAX_SIZE) * 100} $end={(filters.size[1] / MAX_SIZE) * 100} />
-              <RangeInputBase min={0} max={500} step={1} value={filters.size[0]} onChange={(e) => handleRangeChange('size', 0, Number(e.target.value), 500)} />
-              <RangeInputBase min={0} max={500} step={1} value={filters.size[1]} onChange={(e) => handleRangeChange('size', 1, Number(e.target.value), 500)} />
+              <RangeInputBase min={0} max={MAX_SIZE} step={1} value={filters.size[0]} onChange={(e) => handleRangeChange('size', 0, Number(e.target.value), MAX_SIZE)} />
+              <RangeInputBase min={0} max={MAX_SIZE} step={1} value={filters.size[1]} onChange={(e) => handleRangeChange('size', 1, Number(e.target.value), MAX_SIZE)} />
             </MultiRangeContainer>
           </FilterSection>
 
+          {/* 형태(Shape) 섹션 */}
           <FilterSection $isCurrent={activeIcon === "shape"} ref={(el) => (sectionRefs.current["shape"] = el)}>
             <FilterSectionTitle>형태</FilterSectionTitle>
             <OptionList>
@@ -434,6 +459,7 @@ export const FilterSidebar: React.FC = () => {
             </OptionList>
           </FilterSection>
 
+          {/* 색상(Color) 섹션 */}
           <FilterSection $isCurrent={activeIcon === "color"} ref={(el) => (sectionRefs.current["color"] = el)}>
             <FilterSectionTitle>색상</FilterSectionTitle>
             <OptionList>
@@ -443,6 +469,7 @@ export const FilterSidebar: React.FC = () => {
             </OptionList>
           </FilterSection>
 
+          {/* 기타(Etc/Ship) 섹션 */}
           <FilterSection $isCurrent={activeIcon === "ship"} ref={(el) => (sectionRefs.current["ship"] = el)} style={{ borderBottom: "none" }}>
             <FilterSectionTitle>기타</FilterSectionTitle>
             <OptionList>
@@ -451,13 +478,12 @@ export const FilterSidebar: React.FC = () => {
               ))}
             </OptionList>
           </FilterSection>
+          
           <FooterButtons>
-          <ResetButton onClick={() => handleIconClick("reset")}>초기화</ResetButton>
-          <SearchButton onClick={handleClose}>적용</SearchButton>
-        </FooterButtons>
+            <ResetButton onClick={resetFilters}>초기화</ResetButton>
+            <SearchButton onClick={handleApply}>적용</SearchButton>
+          </FooterButtons>
         </div>
-
-        
       </FilterPanel>
     </SidebarWrapper>
   );

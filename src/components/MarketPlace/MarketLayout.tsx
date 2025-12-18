@@ -4,10 +4,11 @@ import { MarketProvider } from "./MarketContext";
 import { MarketFilter } from "./MarketFilter";
 import { ProductList } from "./ProductList";
 import { Pagination } from "./Pagination";
+import { FilterSidebar } from "./FilterSideBar";
 
 // Styled Components
 const StyledMarketLayout = styled.div`
-  max-width: 1200px;
+  max-width: 1500px;
   margin: 0 auto;
   margin-top: 90px;
   padding: 20px;
@@ -28,6 +29,7 @@ interface MarketLayoutProps {
 const MarketLayoutBase: React.FC<MarketLayoutProps> = ({ children }) => {
   return (
     <MarketProvider>
+      <FilterSidebar/>
       <StyledMarketLayout>
         <Header>ARTWORKS</Header>
         {children}
