@@ -105,7 +105,7 @@ const MainPageLayout: React.FC = () => {
         >
           <div>
             <StyledH1 data-scroll data-scroll-speed="1">
-              <span>그림구매의 시작, Arto</span> 
+              <span>絵画購入開始, Arto</span> 
             </StyledH1>
             <video
     autoPlay
@@ -123,10 +123,10 @@ const MainPageLayout: React.FC = () => {
     }}
   >
     <source src="/videos/mainpage_video.mp4" type="video/mp4" />
-    브라우저가 비디오를 지원하지 않습니다.
+    ブラウザはビデオをサポートしていません。
   </video>
             <StyledP data-scroll data-scroll-speed="2" data-scroll-delay="0.2">
-              대중이 직접 선택한 청년·신진화가의 작품을 만나보세요.
+              大衆が直接選択した青年·新進画家の作品に会ってみましょう。
             </StyledP>
           </div>
         </StyledSection>
@@ -135,21 +135,21 @@ const MainPageLayout: React.FC = () => {
         <StyledSectionPin>
           <PinWrap ref={pinWrapRef}>
             <StyledH2>
-              공간디자인 전문가가 제안하는 아트 스타일링
-블루 스펙트럼 인테리어
-시원한 블루톤으로 꾸민 나만의 안식처,
-심신을 진정시키는 감성적 역할뿐 아니라 공간의 중심을 잡아줍니다
+              空間デザインの専門家が提案するアートスタイリング
+ブルースペクトル インテリア
+涼しいブルートーンで飾った私だけの安息所、
+心身を鎮静させる感性的な役割だけでなく、空間の中心を整えてくれます
             </StyledH2>
             <StyledImage
-              src="https://images.pexels.com/photos/5207262/pexels-photo-5207262.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=900"
+              src="https://plus.unsplash.com/premium_photo-1664272436668-78437b92929e?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
               alt="First Image"
             />
             <StyledImage
-              src="https://images.pexels.com/photos/3371358/pexels-photo-3371358.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=900"
+              src="https://images.unsplash.com/photo-1548811579-017cf2a4268b?q=80&w=689&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
               alt="Second Image"
             />
             <StyledImage
-              src="https://images.pexels.com/photos/3618545/pexels-photo-3618545.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=900"
+              src="https://images.unsplash.com/photo-1529432337323-223e988a90fb?q=80&w=725&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
               alt="Third Image"
             />
           </PinWrap>
@@ -162,13 +162,12 @@ const MainPageLayout: React.FC = () => {
           style={{ '--bg-color': '#e3857a', '--text-color': '#f1dba7' } as React.CSSProperties}
         >
           <StyledImage
-            src="https://images.pexels.com/photos/4791474/pexels-photo-4791474.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
+            src="https://images.unsplash.com/photo-1652172264794-a83fe7c190f3?q=80&w=735&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
             alt="Last Image"
           />
           <CreditH2 data-scroll data-scroll-speed="1">
-            <a href="https://thisisadvantage.com" target="_blank" rel="noopener noreferrer">
-              Made by Advantage
-            </a>
+            私たちが共有するこの小さなキャンバスが、<br />
+            あなたの世界をより輝かしく、美しい色彩で彩ることでしょう。
           </CreditH2>
         </StyledSection>
       </PageContainer>

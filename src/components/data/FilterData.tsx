@@ -39,7 +39,6 @@ export const MOOD_OPTIONS = [
   { label: "抽象", value: 5 },
 ];
 
-// 기타 옵션은 문자열 리스트이므로 그대로 두거나 mapping합니다.
 export const ETC_OPTIONS = [
   { label: "送料無料", value: "FREE_SHIPPING" },
   { label: "着払い", value: "CASH_ON_DELIVERY" },
@@ -55,6 +54,7 @@ export const MORPH_OPTIONS = [
   { label: "立体的", value: "THREE_DIMENSIONAL" },
   { label: "不定形", value: "IRREGULAR" },
 ];
+
 
 export const COLOR_OPTIONS = [
   { hex: "#FF0000", name: "Red", value: 1 },

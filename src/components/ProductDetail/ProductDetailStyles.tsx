@@ -46,6 +46,11 @@ export const ImageArea = styled.div`
     border: 1px solid #f0f0f0;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   }
+  p {
+    margin-top: 15px;
+    font-size: 13px;
+    color: #999;
+  }
   p { margin-top: 15px; font-size: 13px; color: #999; }
 `;
 
@@ -126,6 +131,7 @@ export const ActionButton = styled.button<{ $active?: boolean }>`
   &:hover { background-color: #f9f9f9; }
 `;
 
+/* --- Inquiry Section Styles --- */
 export const InquirySection = styled.div`
   margin-top: 80px;
   padding-top: 60px;
@@ -140,14 +146,34 @@ export const InquiryTitle = styled.h3`
   margin-bottom: 10px;
 `;
 
+
+  p { color: #666; font-size: 14px; margin-bottom: 20px; }
+`;
+
+export const InquiryTitle = styled.h3`
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 10px;
+`;
+
 export const InquiryForm = styled.div`
   display: flex;
   flex-direction: column;
   gap: 15px;
+
   input, select, textarea {
-    width: 100%; padding: 12px 15px; border: 1px solid #ddd;
-    border-radius: 4px; font-family: inherit; font-size: 14px;
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 14px;
     &:focus { outline: 1px solid #222; border-color: #222; }
+  }
+
+  textarea {
+    height: 150px;
+    resize: none;
   }
   textarea { height: 150px; resize: none; }
 `;
@@ -224,3 +250,16 @@ export const ProductDetailLayout: React.FC<{ product: any }> = ({ product }) => 
     </PageLayout>
   );
 };
+
+
+export const SubmitButton = styled.button`
+  align-self: flex-end;
+  padding: 12px 30px;
+  background-color: #222;
+  color: #fff;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  &:hover { background-color: #444; }
+`;

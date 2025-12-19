@@ -18,8 +18,21 @@ export default defineConfig({
       "127.0.0.1"
     ],
 
-    // 4️⃣ 프록시 설정: 프론트에서 /api로 시작하는 요청을 백엔드(8080)로 전달
-    proxy: {
+ proxy: {
+      // ✅ 네가 실제로 호출하는 prefix에 맞춤
+      // "/api/v1": {
+      //   target: "http://localhost:8080",
+      //   changeOrigin: true,
+      //   secure: false,
+      // },
+
+      // // (선택) 혹시 다른 코드에서 /api 로도 부르면 같이 커버
+      // "/api": {
+      //   target: "http://localhost:8080",
+      //   changeOrigin: true,
+      //   secure: false,
+      // },
+
       "/api": {
         target: "http://localhost:8080",
         changeOrigin: true,

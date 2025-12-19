@@ -350,27 +350,6 @@ export const FilterSidebar: React.FC = () => {
   const handleClose = () => setIsPanelOpen(false);
 
   const handleApply = () => {
-    // 1. URLSearchParams를 사용하여 파라미터 문자열 생성
-    const params = new URLSearchParams();
-    
-    if (filters.space) params.append("spaces", filters.space.toString());
-    if (filters.mood) params.append("moods", filters.mood.toString());
-    if (filters.morph) params.append("morph", filters.morph);
-    if (filters.color) params.append("colors", filters.color.toString());
-    
-    // 가격 및 크기 범위
-    params.append("minPrice", filters.won[0].toString());
-    params.append("maxPrice", filters.won[1].toString());
-    params.append("minSize", filters.size[0].toString());
-    params.append("maxSize", filters.size[1].toString());
-
-    // 기타 (배열)
-    if (filters.ship.length > 0) {
-      filters.ship.forEach(s => params.append("etc", s));
-    }
-
-    // 2. 알림창으로 파라미터 출력
-    alert(`백엔드로 전송될 파라미터:\n?${params.toString()}`);
     applyFilters(); // Context에서 가져온 함수 실행
 
     // 3. 패널 닫기
@@ -429,7 +408,7 @@ export const FilterSidebar: React.FC = () => {
 
           {/* 공간(space) 섹션 */}
 <FilterSection $isCurrent={activeIcon === "space"} ref={(el) => (sectionRefs.current["space"] = el)}>
-  <FilterSectionTitle>공간</FilterSectionTitle>
+  <FilterSectionTitle>空間</FilterSectionTitle>
   <OptionList>
     {SPACE_OPTIONS.map((o) => (
       <OptionButton 
@@ -445,7 +424,7 @@ export const FilterSidebar: React.FC = () => {
 
 {/* 분위기(mood/Mood) 섹션 */}
 <FilterSection $isCurrent={activeIcon === "mood"} ref={(el) => (sectionRefs.current["mood"] = el)}>
-  <FilterSectionTitle>분위기</FilterSectionTitle>
+  <FilterSectionTitle>雰囲気</FilterSectionTitle>
   <OptionList>
     {MOOD_OPTIONS.map((o) => (
       <OptionButton 
@@ -461,7 +440,7 @@ export const FilterSidebar: React.FC = () => {
 
           {/* 가격(Won) 섹션 */}
           <FilterSection $isCurrent={activeIcon === "won"} ref={(el) => (sectionRefs.current["won"] = el)}>
-            <FilterSectionTitle>가격</FilterSectionTitle>
+            <FilterSectionTitle>価格</FilterSectionTitle>
             <RangeLabelGroup>
               <span>{formatPriceLabel(filters.won[0])}</span>
               <span>{formatPriceLabel(filters.won[1])}</span>
@@ -476,7 +455,7 @@ export const FilterSidebar: React.FC = () => {
 
           {/* 크기(Size) 섹션 */}
           <FilterSection $isCurrent={activeIcon === "size"} ref={(el) => (sectionRefs.current["size"] = el)}>
-            <FilterSectionTitle>크기</FilterSectionTitle>
+            <FilterSectionTitle>サイズ</FilterSectionTitle>
             <RangeLabelGroup>
               <span>{filters.size[0]}cm</span>
               <span>{filters.size[1]}cm</span>
@@ -491,7 +470,7 @@ export const FilterSidebar: React.FC = () => {
 
           {/* 형태(morph) 섹션 */}
           <FilterSection $isCurrent={activeIcon === "morph"} ref={(el) => (sectionRefs.current["morph"] = el)}>
-            <FilterSectionTitle>형태</FilterSectionTitle>
+            <FilterSectionTitle>形状</FilterSectionTitle>
             <OptionList>
               {MORPH_OPTIONS.map((m: { label: string; value: string }) => (
                 <OptionButton key={m.value} $isActive={filters.morph === m.value} onClick={() => setFilters(p => ({ ...p, morph: m.value }))}>{m.label}</OptionButton>
@@ -501,7 +480,7 @@ export const FilterSidebar: React.FC = () => {
 
           {/* 색상(Color) 섹션 */}
           <FilterSection $isCurrent={activeIcon === "color"} ref={(el) => (sectionRefs.current["color"] = el)}>
-            <FilterSectionTitle>색상</FilterSectionTitle>
+            <FilterSectionTitle>カラー</FilterSectionTitle>
             <OptionList>
               {COLOR_OPTIONS.map((c) => (
                 <ColorOption key={c.hex} hex={c.hex} $isSelected={filters.color === c.value} onClick={() => setFilters(p => ({ ...p, color: c.value }))} title={c.name} />
@@ -511,7 +490,7 @@ export const FilterSidebar: React.FC = () => {
 
           {/* 기타(Etc/Ship) 섹션 */}
           <FilterSection $isCurrent={activeIcon === "ship"} ref={(el) => (sectionRefs.current["ship"] = el)} style={{ borderBottom: "none" }}>
-            <FilterSectionTitle>기타</FilterSectionTitle>
+            <FilterSectionTitle>その他</FilterSectionTitle>
             <OptionList>
               {ETC_OPTIONS.map((o) => (
                 <OptionButton key={o.value} $isActive={filters.ship.includes(o.value)} onClick={() => handleEtcToggle(o.value)}>{o.label}</OptionButton>
@@ -520,8 +499,8 @@ export const FilterSidebar: React.FC = () => {
           </FilterSection>
           
           <FooterButtons>
-            <ResetButton onClick={resetFilters}>초기화</ResetButton>
-            <SearchButton onClick={handleApply}>적용</SearchButton>
+            <ResetButton onClick={resetFilters}>リセット</ResetButton>
+            <SearchButton onClick={handleApply}>適用</SearchButton>
           </FooterButtons>
         </div>
       </FilterPanel>

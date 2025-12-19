@@ -64,7 +64,7 @@ export const useMyCart = () => {
   const checkout = async (userId: number, request: OrderCheckoutRequest) => {
     try {
       // 백엔드: @PostMapping("/api/orders/checkout/{userId}") 호출
-      const res = await axiosInstance.post(`/api/orders/checkout/${userId}`, request);
+      const res = await axiosInstance.post(`/orders/checkout/${userId}`, request);
       await fetchCart(); // 주문 후 장바구니 비워짐 반영
       return res.data;
     } catch (e: any) {

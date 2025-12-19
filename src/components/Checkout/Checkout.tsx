@@ -1,4 +1,3 @@
-// src/components/Checkout/Checkout.tsx
 import React, { ReactNode } from "react";
 import {
   LayoutContainer,
@@ -13,30 +12,25 @@ import {
   ProductSummaryBlock,
   ProductInfo,
   SummaryColumn,
+  SummaryBox,
   SummaryRow,
   FinalPrice,
   FinalButton,
   PaymentMethod,
   RadioLabel,
+  SideSection,
+  SideInfoText,
+  AgreementSection,
 } from "./CheckoutStyles";
-import {
-  DUMMY_PRODUCTS,
-  DUMMY_SUMMARY,
-  ProductItem,
-  OrderSummaryData,
-} from "../data/CheckoutData";
+import { ProductItem, OrderSummaryData } from "../data/CheckoutData";
 
 // --- 하위 컴포넌트 정의 ---
 
-// 1. 상품 요약 정보
-const ProductSummary: React.FC<{ products: ProductItem[] }> = ({
-  products,
-}) => (
+const ProductSummary: React.FC<{ products: ProductItem[] }> = ({ products }) => (
   <ProductSummaryBlock>
     <SectionTitle>注文・お支払い</SectionTitle>
     {products.map((p) => (
       <ProductInfo key={p.id}>
-        <div>{/* Image Placeholder */}</div>
         <div>
           <p>[未登録] {p.title}</p>
           <p>
@@ -49,18 +43,13 @@ const ProductSummary: React.FC<{ products: ProductItem[] }> = ({
   </ProductSummaryBlock>
 );
 
-// 2. 입력 필드 그룹
-const InputGroup: React.FC<{ label: string; children: ReactNode }> = ({
-  label,
-  children,
-}) => (
+const InputGroup: React.FC<{ label: string; children: ReactNode }> = ({ label, children }) => (
   <FormRow>
     <label>{label}</label>
     <div>{children}</div>
   </FormRow>
 );
 
-// 3. 결제 방법 선택
 const PaymentSelection: React.FC = () => (
   <InfoBlock>
     <SectionTitle>お支払い方法</SectionTitle>
@@ -81,8 +70,11 @@ const PaymentSelection: React.FC = () => (
   </InfoBlock>
 );
 
-// 4. 우측 최종 결제 요약
-const FinalSummary: React.FC<{ summary: OrderSummaryData }> = ({ summary }) => (
+// 4. 우측 최종 결제 요약 (사진의 주문자 정보 + 배송안내 + 결제박스 포함)
+const FinalSummary: React.FC<{ summary: OrderSummaryData; userEmail?: string }> = ({ 
+  summary, 
+  userEmail="시발럼"
+}) => (
   <SummaryColumn>
     <SectionTitle>お支払い合計金額</SectionTitle>
 
@@ -109,13 +101,10 @@ const FinalSummary: React.FC<{ summary: OrderSummaryData }> = ({ summary }) => (
   </SummaryColumn>
 );
 
-// --- Compound Component 구성 ---
-
 interface CheckoutLayoutProps {
   children: ReactNode;
 }
 
-// Base Component: 메인 Grid 레이아웃을 정의
 const CheckoutLayoutBase: React.FC<CheckoutLayoutProps> = ({ children }) => {
   return (
     <LayoutContainer>
@@ -124,19 +113,13 @@ const CheckoutLayoutBase: React.FC<CheckoutLayoutProps> = ({ children }) => {
   );
 };
 
-// 하위 컴포넌트들을 Base에 연결
 export const Checkout = Object.assign(CheckoutLayoutBase, {
-  // 상품 및 입력 섹션 (Left Column)
   InputColumn: InputColumn,
   Product: ProductSummary,
   InputGroup: InputGroup,
   InputField: InputField,
   Select: SelectBox,
-
-  // 결제 방식
   Payment: PaymentSelection,
-
-  // 결제 요약 섹션 (Right Column)
   SummaryColumn: SummaryColumn,
   FinalSummary: FinalSummary,
 });

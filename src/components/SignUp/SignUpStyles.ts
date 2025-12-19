@@ -13,7 +13,7 @@ export const PageWrapper = styled.div`
   min-height: calc(100vh - 100px);
   display: flex;
   justify-content: center;
-  padding: 50px 20px;
+  padding: 120px 20px;
   background-color: #fff;
   font-family: Arial, sans-serif;
 `;

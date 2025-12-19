@@ -38,6 +38,11 @@ const ItemCard = styled.div`
     height: 250px;
     object-fit: cover;
     margin-bottom: 10px;
+    pointer-events: none; /* 이미지 클릭 방해 금지 */
+  }
+
+  h3, p, strong {
+    pointer-events: none; /* 텍스트 클릭 방해 금지 */
   }
 
   h3 { font-size: 1.1em; margin: 5px 0; color: #333; padding-left: 10px; }

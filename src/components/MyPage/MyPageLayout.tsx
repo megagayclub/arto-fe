@@ -37,23 +37,37 @@ const OrderAllButton = styled.button`
   background-color: #222;
   color: #fff;
   border: none;
-  padding: 10px 20px;
+  padding: 12px 24px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   border-radius: 4px;
-  margin-bottom: 15px;
+  margin-top: 17px;
   transition: background 0.2s;
   
   &:hover {
     background-color: #444;
   }
 
-  &:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
+  if (isLoading) return <p>注文履歴を読み込み中...</p>;
+
+  if (error) {
+    return (
+      <p style={{ color: "red" }}>
+        注文履歴の取得中にエラーが発生しました: {error}
+      </p>
+    );
   }
 `;
+
+const OrderPrice = styled.div`
+  color: #363636ff;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 17px; 
+`
 
 // --- 구매이력 콘텐츠 컴포넌트 ---
 const PurchaseHistoryContent: React.FC = () => {
@@ -64,24 +78,43 @@ const PurchaseHistoryContent: React.FC = () => {
   if (!orders || orders.length === 0) {
     return (
       <div style={{ textAlign: "center", padding: "30px 0", color: "#999" }}>
-        <p>구매 이력이 없습니다.</p>
+        <p>注文履歴はありません。</p>
+        <p style={{ fontSize: "12px", marginTop: "10px" }}>
+          Artoの素敵な作品をコレクションしてみませんか？
+        </p>
       </div>
     );
   }
 
   return (
     <>
-      {orders.map((o) => (
-        <MyPage.Product
-          key={o.orderId}
-          id={o.orderId}
-          title={`${o.artworkTitle} (${o.orderStatus})`}
-          dateLabel="구매일"
-          date={o.orderDate}
-          price={Number(o.totalAmount)}
-          image={o.thumbnailUrl ?? undefined}
-        />
-      ))}
+      {orders.map((o) => {
+        const isPaid = o.paymentStatus === "CONFIRMED" && !!o.paymentDate;
+
+        const dateLabel = isPaid ? "購入日" : "注文日";
+        const date = isPaid ? formatDate(o.paymentDate) : formatDate(o.orderDate);
+
+        const payLabel =
+          !o.paymentStatus
+            ? "決済情報なし"
+            : o.paymentStatus === "PENDING"
+            ? "決済待ち"
+            : o.paymentStatus === "CONFIRMED"
+            ? "決済完了"
+            : o.paymentStatus;
+
+        return (
+          <MyPage.Product
+            key={o.orderId}
+            id={o.orderId}
+            title={`${o.artworkTitle}（${payLabel} / ${o.orderStatus}）`}
+            dateLabel={dateLabel}
+            date={date}
+            price={Number.isFinite(toNumber(o.totalAmount)) ? toNumber(o.totalAmount) : undefined}
+            image={o.thumbnailUrl ?? undefined}
+          />
+        );
+      })}
     </>
   );
 };
@@ -94,11 +127,19 @@ export const MyPageLayout: React.FC = () => {
   const { wishlist, isLoading: wishLoading, error: wishError } = useMyWishlist();
   const wishlistItems = Array.isArray(wishlist) ? wishlist : [];
 
-  const { cart, isLoading: cartLoading, removeItem, checkout } = useMyCart();
+  const { cart, isLoading: cartLoading, removeItem } = useMyCart();
   const cartItems = cart?.items ?? [];
 
   const { inquiries, isLoading: inqLoading, error: inqError } = useMyInquiries();
   const inquiryItems = Array.isArray(inquiries) ? inquiries : [];
+
+  // 💰 장바구니 총액 계산 로직
+  const totalCartPrice = cartItems.reduce((acc, item) => acc + Number(item.price), 0);
+
+  // 주문 처리 핸들러
+  const handleOrderAll = async () => {
+    navigate("/checkout/")
+  };
 
   // 🎯 전체 주문 처리 핸들러
   const handleOrderAll = async () => {
@@ -133,20 +174,22 @@ export const MyPageLayout: React.FC = () => {
           {/* 상단 대시보드 */}
           <TopDashboard>
             <InfoCard>
-              <h3>회원 정보</h3>
+              <h3>会員情報</h3>
               <div className="content">
-                <p>E-mail (ID)</p>
-                <p>{userEmail || "로그인이 필요합니다."}</p>
+                <p>E-mail（ID）</p>
+                <p>{userEmail || "ログインが必要です。"}</p>
               </div>
             </InfoCard>
             <MyPage.Order /> 
           </TopDashboard>
 
-          {/* 찜 목록 섹션 */}
-          <MyPage.Section title={`찜 목록 (${wishlistItems.length})`}>
-            {wishLoading && <p>불러오는 중...</p>}
+          {/* 찜 목록 */}
+          <MyPage.Section title={`ウィッシュリスト (${wishlistItems.length})`}>
+            {wishLoading && <p>読み込み中...</p>}
             {wishError && <p style={{ color: "red" }}>{wishError}</p>}
-            {!wishLoading && wishlistItems.length === 0 && <p style={{ color: "#999" }}>찜한 작품이 없습니다.</p>}
+            {!wishLoading && wishlistItems.length === 0 && (
+              <p style={{ color: "#999" }}>登録された作品はありません。</p>
+            )}
             {wishlistItems.map((item) => (
               <MyPage.Product
                 key={item.wishlistId}
@@ -158,12 +201,34 @@ export const MyPageLayout: React.FC = () => {
             ))}
           </MyPage.Section>
 
-          {/* 장바구니 섹션 */}
-          <MyPage.Section title={`카트 (${cartItems.length})`}>
+          {/* 장바구니 */}
+          <MyPage.Section title={`カート (${cartItems.length})`}>
+            {cartLoading && <p>読み込み中...</p>}
+            {cartItems.length === 0 && (
+              <p style={{ color: "#999" }}>登録された作品はありません。</p>
+            )}
+            {cartItems.map((item) => (
+              <MyPage.Product
+                key={item.cartItemId}
+                id={item.artworkId}
+                title={item.title}
+                price={Number(item.price)}
+                image={item.thumbnailImageUrl}
+              >
+                <DeleteButton onClick={() => removeItem(item.cartItemId)}>
+                  削除
+                </DeleteButton>
+              </MyPage.Product>
+            ))}
+            
             {cartItems.length > 0 && (
               <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <OrderPrice>
+                  총 <span>{totalCartPrice.toLocaleString()}원</span>
+
+                </OrderPrice>
                 <OrderAllButton onClick={handleOrderAll}>
-                  전체 상품 주문하기
+                   주문하기
                 </OrderAllButton>
               </div>
             )}
@@ -185,23 +250,24 @@ export const MyPageLayout: React.FC = () => {
             ))}
           </MyPage.Section>
 
-          {/* 구매 이력 섹션 */}
-          <MyPage.Section title="구매 이력">
+          {/* 구매 이력 */}
+          <MyPage.Section title="注文 / 購入履歴">
             <PurchaseHistoryContent />
           </MyPage.Section>
 
-          {/* 문의 사항 섹션 */}
-          <MyPage.Section title={`문의사항 (${inquiryItems.length})`}>
-            {inqLoading && <p>불러오는 중...</p>}
-            {inqError && <p style={{ color: "red" }}>{inqError}</p>}
-            {!inqLoading && inquiryItems.length === 0 && <p style={{ color: "#999" }}>문의 이력이 없습니다.</p>}
+          {/* 문의 사항 */}
+          <MyPage.Section title={`お問い合わせ (${inquiryItems.length})`}>
+            {inqLoading && <p>読み込み中...</p>}
+            {inquiryItems.length === 0 && (
+              <p style={{ color: "#999" }}>お問い合わせ履歴はありません。</p>
+            )}
             {inquiryItems.map((q) => (
               <MyPage.Product
                 key={q.inquiryId}
                 id={q.inquiryId}
-                titleLabel="문의제목"
+                titleLabel="お問い合わせ件名"
                 title={q.title}
-                dateLabel="문의일"
+                dateLabel="お問い合わせ日"
                 date={new Date(q.createdAt).toLocaleDateString()}
                 hideImage={true}
               />
