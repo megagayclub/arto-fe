@@ -59,29 +59,65 @@ const OrderAllButton = styled.button`
 const PurchaseHistoryContent: React.FC = () => {
   const { orders, isLoading, error } = useMyOrders();
 
-  if (isLoading) return <p>구매 이력 불러오는 중...</p>;
-  if (error) return <p style={{ color: "red" }}>오류 발생: {error}</p>;
+  if (isLoading) return <p>주문 이력 불러오는 중...</p>;
+
+  if (error) {
+    return (
+      <p style={{ color: "red" }}>
+        주문 이력을 불러오는 중 오류가 발생했습니다: {error}
+      </p>
+    );
+  }
+
   if (!orders || orders.length === 0) {
     return (
       <div style={{ textAlign: "center", padding: "30px 0", color: "#999" }}>
-        <p>구매 이력이 없습니다.</p>
+        <p>주문 이력이 없습니다.</p>
+        <p style={{ fontSize: "12px", marginTop: "10px" }}>
+          Artisry의 멋진 작품을 컬렉션 해보세요!
+        </p>
       </div>
     );
   }
 
+  const toNumber = (v: any) => (typeof v === "number" ? v : Number(v));
+
+  const formatDate = (v?: string | null) => {
+    if (!v) return "";
+    const d = new Date(v);
+    return isNaN(d.getTime()) ? v : d.toLocaleDateString();
+  };
+
   return (
     <>
-      {orders.map((o) => (
-        <MyPage.Product
-          key={o.orderId}
-          id={o.orderId}
-          title={`${o.artworkTitle} (${o.orderStatus})`}
-          dateLabel="구매일"
-          date={o.orderDate}
-          price={Number(o.totalAmount)}
-          image={o.thumbnailUrl ?? undefined}
-        />
-      ))}
+      {orders.map((o) => {
+        const isPaid = o.paymentStatus === "CONFIRMED" && !!o.paymentDate;
+
+        const dateLabel = isPaid ? "구매일" : "주문일";
+        const date = isPaid ? formatDate(o.paymentDate) : formatDate(o.orderDate);
+
+        // 결제 상태 텍스트(선택)
+        const payLabel =
+          !o.paymentStatus
+            ? "결제정보없음"
+            : o.paymentStatus === "PENDING"
+            ? "결제대기"
+            : o.paymentStatus === "CONFIRMED"
+            ? "결제완료"
+            : o.paymentStatus;
+
+        return (
+          <MyPage.Product
+            key={o.orderId}
+            id={o.orderId}
+            title={`${o.artworkTitle} (${payLabel} / ${o.orderStatus})`}
+            dateLabel={dateLabel}
+            date={date}
+            price={Number.isFinite(toNumber(o.totalAmount)) ? toNumber(o.totalAmount) : undefined}
+            image={o.thumbnailUrl ?? undefined}
+          />
+        );
+      })}
     </>
   );
 };
@@ -184,9 +220,14 @@ export const MyPageLayout: React.FC = () => {
               </MyPage.Product>
             ))}
           </MyPage.Section>
+          {/* 2-4. 구매 이력 섹션 (API 연동) */}
+          <MyPage.Section title="주문 / 구매 이력">
 
+<<<<<<< HEAD
           {/* 구매 이력 섹션 */}
           <MyPage.Section title="구매 이력">
+=======
+>>>>>>> 4b17c226b3f17d6558bb6094ca8c2d7501930a1e
             <PurchaseHistoryContent />
           </MyPage.Section>
 
