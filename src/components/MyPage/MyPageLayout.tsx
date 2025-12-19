@@ -1,3 +1,4 @@
+// src/components/MyPage/MyPageLayout.tsx
 import React from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
@@ -10,6 +11,13 @@ import { useMyWishlist } from "../../hooks/useMyWishlist";
 import { useMyCart } from "../../hooks/useMyCart";
 import { useMyOrders } from "../../hooks/useMyOrders";
 import { useMyInquiries } from "../../hooks/useMyInquiries";
+
+const formatDate = (dateString?: string | null) => {
+  if (!dateString) return "-";
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return "-";
+  return date.toLocaleDateString("ko-KR");
+};
 
 const PageWrapper = styled.div`
   padding: 20px 0;
@@ -88,11 +96,13 @@ const PurchaseHistoryContent: React.FC = () => {
 
   return (
     <>
-      {orders.map((o) => {
+            {orders.map((o) => {
         const isPaid = o.paymentStatus === "CONFIRMED" && !!o.paymentDate;
 
         const dateLabel = isPaid ? "購入日" : "注文日";
-        const date = isPaid ? formatDate(o.paymentDate) : formatDate(o.orderDate);
+        const date = isPaid
+          ? formatDate(o.paymentDate)
+          : formatDate(o.orderDate);
 
         const payLabel =
           !o.paymentStatus
@@ -103,6 +113,8 @@ const PurchaseHistoryContent: React.FC = () => {
             ? "決済完了"
             : o.paymentStatus;
 
+        const priceNumber = Number(o.totalAmount);
+
         return (
           <MyPage.Product
             key={o.orderId}
@@ -110,7 +122,7 @@ const PurchaseHistoryContent: React.FC = () => {
             title={`${o.artworkTitle}（${payLabel} / ${o.orderStatus}）`}
             dateLabel={dateLabel}
             date={date}
-            price={Number.isFinite(toNumber(o.totalAmount)) ? toNumber(o.totalAmount) : undefined}
+            price={Number.isFinite(priceNumber) ? priceNumber : undefined}
             image={o.thumbnailUrl ?? undefined}
           />
         );
