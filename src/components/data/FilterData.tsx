@@ -13,47 +13,47 @@ export interface FilterIcon {
 }
 
 export const MAIN_FILTER_ICONS: FilterIcon[] = [
-  { id: "space", icon: <HiHomeModern />, label: "공간" },
-  { id: "mood", icon: <GiBedLamp />, label: "분위기" },
-  { id: "won", icon: "₩", label: "가격" },
-  { id: "size", icon: <FaRulerCombined />, label: "크기" },
-  { id: "shape", icon: <FaShapes />, label: "형태" },
-  { id: "color", icon: <IoIosColorPalette />, label: "색상" },
-  { id: "ship", icon: <MdLocalShipping />, label: "기타" },
-  { id: "reset", icon: "↺", label: "초기화" },
+  { id: "space", icon: <HiHomeModern />, label: "空間" },
+  { id: "mood", icon: <GiBedLamp />, label: "雰囲気" },
+  { id: "won", icon: "₩", label: "価格" },
+  { id: "size", icon: <FaRulerCombined />, label: "サイズ" },
+  { id: "shape", icon: <FaShapes />, label: "形" },
+  { id: "color", icon: <IoIosColorPalette />, label: "色" },
+  { id: "ship", icon: <MdLocalShipping />, label: "その他" },
+  { id: "reset", icon: "↺", label: "リセット" },
 ];
 
 export const SPACE_OPTIONS = [
-  { label: "거실", value: 1 },
-  { label: "침실", value: 2 },
-  { label: "주방", value: 3 },
-  { label: "사무실", value: 4 },
-  { label: "현관", value: 5 }
+  { label: "リビング", value: 1 },
+  { label: "寝室", value: 2 },
+  { label: "キッチン", value: 3 },
+  { label: "オフィス", value: 4 },
+  { label: "玄関", value: 5 }
 ];
 
 export const MOOD_OPTIONS = [
-  { label: "모던", value: 1 },
-  { label: "코지", value: 2 },
-  { label: "빈티지", value: 3 },
-  { label: "미니멀", value: 4 },
-  { label: "추상화", value: 5 },
+  { label: "モダン", value: 1 },
+  { label: "コージー", value: 2 },
+  { label: "ヴィンテージ", value: 3 },
+  { label: "ミニマル", value: 4 },
+  { label: "抽象", value: 5 },
 ];
 
 // 기타 옵션은 문자열 리스트이므로 그대로 두거나 mapping합니다.
 export const ETC_OPTIONS = [
-  { label: "무료배송", value: "FREE_SHIPPING" },
-  { label: "착불배송", value: "CASH_ON_DELIVERY" },
-  { label: "퀵배송", value: "PARCEL" },
+  { label: "送料無料", value: "FREE_SHIPPING" },
+  { label: "着払い", value: "CASH_ON_DELIVERY" },
+  { label: "クイック配送", value: "PARCEL" },
 ];
 
 export const MORPH_OPTIONS = [
-  { label: "세로 사각형", value: "VERTICAL_RECTANGLE" },
-  { label: "가로 사각형", value: "HORIZONTAL_RECTANGLE" },
-  { label: "원형", value: "CIRCLE" },
-  { label: "정사각형", value: "SQUARE" },
-  { label: "분리된", value: "DIVIDED" },
-  { label: "입체적", value: "THREE_DIMENSIONAL" },
-  { label: "비정형적", value: "IRREGULAR" },
+  { label: "縦長の長方形", value: "VERTICAL_RECTANGLE" },
+  { label: "横長の長方形", value: "HORIZONTAL_RECTANGLE" },
+  { label: "円形", value: "CIRCLE" },
+  { label: "正方形", value: "SQUARE" },
+  { label: "分割", value: "DIVIDED" },
+  { label: "立体的", value: "THREE_DIMENSIONAL" },
+  { label: "不定形", value: "IRREGULAR" },
 ];
 
 export const COLOR_OPTIONS = [
