@@ -52,7 +52,7 @@ const PurchaseHistoryContent: React.FC = () => {
       <div style={{ textAlign: "center", padding: "30px 0", color: "#999" }}>
         <p>주문 이력이 없습니다.</p>
         <p style={{ fontSize: "12px", marginTop: "10px" }}>
-          Artisry의 멋진 작품을 컬렉션 해보세요!
+          Arto의 멋진 작품을 컬렉션 해보세요!
         </p>
       </div>
     );
