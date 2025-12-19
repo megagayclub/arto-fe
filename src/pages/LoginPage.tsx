@@ -72,7 +72,7 @@ const LoginPage: React.FC = () => {
           <Login.RememberMe />
 
           <Login.Action type="submit" isPrimary disabled={isLoading}>
-            {isLoading ? "로그인 중..." : "로그인"} 
+            {isLoading ? "로그인 중..." : "ログイン"} 
           </Login.Action>
 
           <Login.Action type="button" onClick={handleRegister} disabled={isLoading}>
