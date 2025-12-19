@@ -37,7 +37,6 @@ const SignUpPage: React.FC = () => {
     };
 
     // 3. API 호출
-    alert("ㅇㅋ일단2");
     signUp(signUpData);
   };
 

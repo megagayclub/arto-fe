@@ -1,24 +1,20 @@
-// src/components/ProductDetail/ProductDetail.tsx
-import React from "react";
+import React, { useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { ProductDetailType, useArtworkDetail } from "../../hooks/useArtworkDetail";
-import {
-  PageLayout,
-  MainContent,
-  ImageArea,
-  InfoArea,
-  Title,
-  ArtistName,
-  InfoTable,
-  InfoRow,
-  PriceText,
-  ButtonGroup,
-  BuyButton,
-  ActionButton,
-} from "./ProductDetailStyles";
+import { useAddToCart } from "../../hooks/useAddToCart";
+import { useInquiry } from "../../hooks/useInquiry"; 
+import * as S from "./ProductDetailStyles";
 
-const ICON_HEART = "🤍";
+const ICON_INQUIRY = "✉️";
 
+// 문의 카테고리 옵션
+const CATEGORIES = [
+  { value: "SHIPPING", label: "배송 문의" },
+  { value: "PRODUCT_ISSUE", label: "상품문제" },
+  { value: "OTHER", label: "기타 문의" },
+];
+
+// 상단 상세 정보 테이블 컴포넌트 (작품명, 작가명, 사이즈 등)
 const ProductInfoTable: React.FC<{ data: ProductDetailType }> = ({ data }) => {
   const infoRows = [
     { label: "작품명 | Title", value: data.title },
@@ -29,97 +25,164 @@ const ProductInfoTable: React.FC<{ data: ProductDetailType }> = ({ data }) => {
   ];
 
   return (
-    <InfoTable>
+    <S.InfoTable>
       {infoRows.map((row, index) => (
-        <InfoRow key={index}>
+        <S.InfoRow key={index}>
           <span>{row.label}</span>
           <span>{row.value}</span>
-        </InfoRow>
+        </S.InfoRow>
       ))}
-    </InfoTable>
+    </S.InfoTable>
   );
 };
 
 export const ProductDetailLayout: React.FC = () => {
-  // ✅ URL에서 /product/:id 가져오기
   const { id } = useParams<{ id: string }>();
-
-  // ✅ 숫자로 변환
   const artworkId = Number(id);
+  
+  // ✅ 상태 관리 (문의 섹션 및 입력 폼)
+  const [isInquiryOpen, setIsInquiryOpen] = useState(false);
+  const [inquiryData, setInquiryData] = useState({
+    title: "",
+    category: "SHIPPING",
+    content: ""
+  });
 
-  // ✅ 이상한 값(예: "{2}" 같은 거) 방어
-  if (!id || Number.isNaN(artworkId)) {
-    return (
-      <PageLayout>
-        <MainContent>
-          <p style={{ color: "red", padding: "20px" }}>잘못된 작품 ID입니다: {id}</p>
-        </MainContent>
-      </PageLayout>
-    );
-  }
+  const inquiryRef = useRef<HTMLDivElement>(null);
 
+  // ✅ 커스텀 훅 연결
   const { artworkDetail: product, isLoading, error } = useArtworkDetail(artworkId);
+  const { addToCart, isLoading: adding } = useAddToCart();
+  const { submitInquiry, isLoading: submitting, error: inquiryError } = useInquiry();
 
-  if (isLoading) {
-    return (
-      <PageLayout>
-        <MainContent>
-          <p>작품 정보를 불러오는 중입니다...</p>
-        </MainContent>
-      </PageLayout>
-    );
-  }
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setInquiryData(prev => ({ ...prev, [name]: value }));
+  };
 
-  if (error) {
-    return (
-      <PageLayout>
-        <MainContent>
-          <p style={{ color: "red", padding: "20px" }}>오류 발생: {error}</p>
-        </MainContent>
-      </PageLayout>
-    );
-  }
+  const toggleInquiry = () => {
+    setIsInquiryOpen((prev) => !prev);
+    if (!isInquiryOpen) {
+      setTimeout(() => {
+        inquiryRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 100);
+    }
+  };
 
-  if (!product) {
-    return (
-      <PageLayout>
-        <MainContent>
-          <p>작품 정보를 찾을 수 없습니다.</p>
-        </MainContent>
-      </PageLayout>
-    );
-  }
+  const handleAddToCart = async () => {
+    const ok = await addToCart(artworkId);
+    if (ok) alert("장바구니에 담았습니다!");
+  };
+
+  const handleSubmitInquiry = async () => {
+    const { title, content, category } = inquiryData;
+
+    if (!title.trim() || !content.trim()) {
+      alert("제목과 내용을 모두 입력해주세요.");
+      return;
+    }
+
+    const success = await submitInquiry({
+      artworkId,
+      title,
+      category,
+      content,
+    });
+
+    if (success) {
+      alert("문의가 성공적으로 등록되었습니다.");
+      setInquiryData({ title: "", category: "", content: "" });
+      setIsInquiryOpen(false);
+    }
+  };
+
+  if (isLoading) return <S.PageLayout><S.MainContent><p>작품 정보를 불러오는 중입니다...</p></S.MainContent></S.PageLayout>;
+  if (error || !id || isNaN(artworkId)) return <S.PageLayout><S.MainContent><p style={{ color: "red" }}>오류 발생: {error || "잘못된 접근입니다."}</p></S.MainContent></S.PageLayout>;
+  if (!product) return null;
 
   return (
-    <PageLayout>
-      <MainContent>
-        <ImageArea>
-          <img src={product.imagePlaceholder} alt={product.title} />
-          <p style={{ marginTop: "20px", fontSize: "12px", color: "#666" }}>
-            ©{product.year} {product.artist}. All rights reserved.
-          </p>
-        </ImageArea>
+    <S.PageLayout>
+      <S.Container>
+        <S.MainContent>
+          {/* 왼쪽: 이미지 영역 */}
+          <S.ImageArea>
+            <img src={product.imagePlaceholder} alt={product.title} />
+            <p>©{product.year} {product.artist}. All rights reserved.</p>
+          </S.ImageArea>
 
-        <InfoArea>
-          <Title>작품명 | Title</Title>
-          <ArtistName>{product.title}</ArtistName>
+          {/* 오른쪽: 정보 및 구매 영역 */}
+          <S.InfoArea>
+            <S.Title>작품명 | Title</S.Title>
+            <S.ArtistName>{product.title}</S.ArtistName>
 
-          <Title>작가명 | Artist</Title>
-          <ArtistName>{product.artist}</ArtistName>
+            {/* ✅ 여기에 처음에 요청하신 정보 테이블이 들어갑니다 */}
+            <ProductInfoTable data={product} />
 
-          <ProductInfoTable data={product} />
+            <S.Title>판매가격 | Price</S.Title>
+            <S.PriceText>{product.price.toLocaleString()}₩</S.PriceText>
 
-          <Title>판매가격 | Price</Title>
-          <PriceText>{product.price.toLocaleString()}₩</PriceText>
+            <S.ButtonGroup>
+              <S.ActionButton onClick={toggleInquiry} $active={isInquiryOpen}>
+                {ICON_INQUIRY}&nbsp;<span>{isInquiryOpen ? "문의닫기" : "문의하기"}</span>
+              </S.ActionButton>
 
-          <ButtonGroup>
-            <ActionButton>
-              {ICON_HEART}&nbsp;<span style={{ fontSize: "14px" }}>문의하기</span>
-            </ActionButton>
-            <BuyButton>카트에 넣기</BuyButton>
-          </ButtonGroup>
-        </InfoArea>
-      </MainContent>
-    </PageLayout>
+              <S.BuyButton onClick={handleAddToCart} disabled={adding}>
+                {adding ? "처리 중..." : "카트에 넣기"}
+              </S.BuyButton>
+            </S.ButtonGroup>
+          </S.InfoArea>
+        </S.MainContent>
+
+        {/* ✅ 하단: 문의하기 섹션 (제목/카테고리/내용 포함) */}
+        {isInquiryOpen && (
+          <S.InquirySection ref={inquiryRef}>
+            <S.InquiryTitle>작품 문의하기 | Inquiry</S.InquiryTitle>
+            <p>작품에 대해 궁금한 점을 남겨주시면 작가님 혹은 담당 갤러리에서 답변을 드립니다.</p>
+            
+            <S.InquiryForm>
+              {/* 카테고리 선택 */}
+              <select 
+                name="category" 
+                value={inquiryData.category} 
+                onChange={handleInputChange}
+                disabled={submitting}
+              >
+                {CATEGORIES.map(cat => (
+                  <option key={cat.value} value={cat.value}>{cat.label}</option>
+                ))}
+              </select>
+
+              {/* 제목 입력 */}
+              <input 
+                type="text"
+                name="title"
+                placeholder="문의 제목을 입력해주세요."
+                value={inquiryData.title}
+                onChange={handleInputChange}
+                disabled={submitting}
+              />
+
+              {/* 내용 입력 */}
+              <textarea 
+                name="content"
+                placeholder="문의 내용을 상세히 입력해주세요." 
+                value={inquiryData.content}
+                onChange={handleInputChange}
+                disabled={submitting}
+              />
+              
+              {inquiryError && <p style={{ color: "red", fontSize: "13px" }}>{inquiryError}</p>}
+              
+              <S.SubmitButton 
+                onClick={handleSubmitInquiry} 
+                disabled={submitting}
+              >
+                {submitting ? "보내는 중..." : "문의 보내기"}
+              </S.SubmitButton>
+            </S.InquiryForm>
+          </S.InquirySection>
+        )}
+      </S.Container>
+    </S.PageLayout>
   );
 };

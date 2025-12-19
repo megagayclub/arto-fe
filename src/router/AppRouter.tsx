@@ -7,7 +7,6 @@ import Header from "../components/layout/Header/Header"; // 🌟 Header import
 // 인증 페이지
 import LoginPage from '../pages/LoginPage';
 import SignUpPage from '../pages/SignUpPage';
-// import ForgotPasswordPage from '../pages/ForgotPasswordPage';
 
 // 메인 및 작품 페이지
 import MainPageLayout from '../components/MainPage//MainPageLayout'; // 주석 해제 (MainPageLayout을 메인 페이지로 사용)
@@ -16,6 +15,9 @@ import MarketPlacePage from '../pages/MarketPlacePage';
 
 // 마이페이지 및 주문
 import MyPage from '../pages/MyPage';
+
+// 결제 페이지
+import CheckoutPage from '../pages/CheckoutPage';
 
 
 const AppRouter: React.FC = () => {
@@ -40,7 +42,7 @@ const AppRouter: React.FC = () => {
                     
                     {/* 마이페이지 및 주문 */}
                     <Route path="/mypage" element={<MyPage />} />
-                    {/* <Route path="/checkout" element={<CheckoutPage />} /> */}
+                    <Route path="/checkout" element={<CheckoutPage />} />
                     
                     {/* 404 페이지 */}
                     <Route path="*" element={<div>404 Not Found</div>} />

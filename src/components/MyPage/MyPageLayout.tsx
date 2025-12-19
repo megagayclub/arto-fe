@@ -1,172 +1,213 @@
-// src/components/MyPage/MyPageLayout.tsx
-
 import React from "react";
 import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
 
-// 🔹 컴파운드 컴포넌트 MyPage 레고틀
+import { useAuth } from "../../context/AuthContext";
 import { MyPage } from "./MyPage";
+import { TopDashboard, InfoCard } from "./MyPageStyles";
 
-// 🔹 찜 목록 API 훅
 import { useMyWishlist } from "../../hooks/useMyWishlist";
-
-// 🔹 장바구니 API 훅
 import { useMyCart } from "../../hooks/useMyCart";
-
-// 🔹 문의 내역 API 훅 ✅ 추가
+import { useMyOrders } from "../../hooks/useMyOrders";
 import { useMyInquiries } from "../../hooks/useMyInquiries";
 
-// 이 페이지의 전체 콘텐츠 영역에 패딩 등을 줄 수 있습니다.
 const PageWrapper = styled.div`
   padding: 20px 0;
-  min-height: calc(100vh - 80px); /* 헤더 높이를 제외한 최소 높이 */
+  min-height: calc(100vh - 80px);
   background-color: #fff;
 `;
 
-// (더미) 구매 이력
-const PurchaseHistoryContent: React.FC = () => (
-  <div style={{ textAlign: "center", padding: "30px 0", color: "#999" }}>
-    <p>구매 이력이 없습니다.</p>
-    <p style={{ fontSize: "12px", marginTop: "10px" }}>
-      Artisry의 멋진 작품을 컬렉션 해보세요!
-    </p>
-  </div>
-);
+const DeleteButton = styled.button`
+  background: none;
+  border: 1px solid #ddd;
+  padding: 6px 12px;
+  font-size: 12px;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s;
 
+  &:hover {
+    background-color: #f5f5f5;
+    color: #ff4d4f;
+    border-color: #ff4d4f;
+  }
+`;
 
+const OrderAllButton = styled.button`
+  background-color: #222;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  transition: background 0.2s;
+  
+  &:hover {
+    background-color: #444;
+  }
+
+  &:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+`;
+
+// --- 구매이력 콘텐츠 컴포넌트 ---
+const PurchaseHistoryContent: React.FC = () => {
+  const { orders, isLoading, error } = useMyOrders();
+
+  if (isLoading) return <p>구매 이력 불러오는 중...</p>;
+  if (error) return <p style={{ color: "red" }}>오류 발생: {error}</p>;
+  if (!orders || orders.length === 0) {
+    return (
+      <div style={{ textAlign: "center", padding: "30px 0", color: "#999" }}>
+        <p>구매 이력이 없습니다.</p>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      {orders.map((o) => (
+        <MyPage.Product
+          key={o.orderId}
+          id={o.orderId}
+          title={`${o.artworkTitle} (${o.orderStatus})`}
+          dateLabel="구매일"
+          date={o.orderDate}
+          price={Number(o.totalAmount)}
+          image={o.thumbnailUrl ?? undefined}
+        />
+      ))}
+    </>
+  );
+};
+
+// --- 메인 레이아웃 컴포넌트 ---
 export const MyPageLayout: React.FC = () => {
-  // ✅ 찜 목록 API 호출
-  const { wishlist, isLoading, error } = useMyWishlist();
-
-  // ✅ 핵심: wishlist가 배열이 아닐 수도 있으니 무조건 배열로 안전 처리
+  const navigate = useNavigate();
+  const { userEmail } = useAuth();
+  
+  const { wishlist, isLoading: wishLoading, error: wishError } = useMyWishlist();
   const wishlistItems = Array.isArray(wishlist) ? wishlist : [];
 
-  // ✅ 장바구니 API 호출
-  const { cart, isLoading: cartLoading, error: cartError } = useMyCart();
+  const { cart, isLoading: cartLoading, removeItem, checkout } = useMyCart();
   const cartItems = cart?.items ?? [];
 
-
-
-  // ✅ 문의 내역 API 호출 (GET /api/v1/inquiries)
-  const {
-    inquiries,
-    isLoading: inquiryLoading,
-    error: inquiryError,
-  } = useMyInquiries();
-
+  const { inquiries, isLoading: inqLoading, error: inqError } = useMyInquiries();
   const inquiryItems = Array.isArray(inquiries) ? inquiries : [];
+
+  // 🎯 전체 주문 처리 핸들러
+  const handleOrderAll = async () => {
+    if (cartItems.length === 0) return;
+    if (!cart?.userId) {
+      alert("로그인 세션이 만료되었습니다. 다시 로그인해주세요.");
+      return;
+    }
+
+    if (!window.confirm(`총 ${cartItems.length}개의 작품을 결제하시겠습니까?`)) return;
+
+    try {
+      // 배송지 정보는 실제 서비스에서 폼 입력을 받아야 하지만, 여기서는 기본값을 사용합니다.
+      const request = {
+        shippingAddress: "등록된 기본 배송지",
+        receiverName: "구매자",
+        receiverPhone: "010-0000-0000"
+      };
+
+      await checkout(cart.userId, request);
+      alert("주문이 정상적으로 완료되었습니다!");
+      window.location.reload(); // 상태 업데이트를 위해 새로고침 혹은 navigate 활용
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
 
   return (
     <PageWrapper>
-      {/* 🌟 MyPage Compound Component의 기본 레이아웃 사용 */}
       <MyPage>
-        {/* 1. 사이드바 (계정 정보 및 메뉴) */}
-        <MyPage.Sidebar />
-
-        {/* 2. 메인 콘텐츠 영역 */}
         <MyPage.Content>
-          {/* 2-1. 주문 상태 요약 */}
-          <MyPage.Order />
+          {/* 상단 대시보드 */}
+          <TopDashboard>
+            <InfoCard>
+              <h3>회원 정보</h3>
+              <div className="content">
+                <p>E-mail (ID)</p>
+                <p>{userEmail || "로그인이 필요합니다."}</p>
+              </div>
+            </InfoCard>
+            <MyPage.Order /> 
+          </TopDashboard>
 
-          {/* 2-2. ✅ 찜 목록 섹션 */}
+          {/* 찜 목록 섹션 */}
           <MyPage.Section title={`찜 목록 (${wishlistItems.length})`}>
-            {isLoading && <p>찜 목록 불러오는 중...</p>}
-
-            {error && (
-              <p style={{ color: "red" }}>
-                찜 목록을 불러오는 중 오류가 발생했습니다: {error}
-              </p>
-            )}
-
-            {!isLoading && !error && wishlistItems.length === 0 && (
-              <p style={{ fontSize: "14px", color: "#999" }}>
-                찜한 작품이 없습니다.
-              </p>
-            )}
-
-            {!isLoading &&
-              !error &&
-              wishlistItems.map((item) => (
-                <MyPage.Product
-                  key={item.wishlistId}
-                  id={item.artworkId}
-                  title={item.title}
-                  date={new Date(item.addedAt).toLocaleDateString()}
-                  price={item.price}
-                  image={item.thumbnailImageUrl}
-                />
-              ))}
+            {wishLoading && <p>불러오는 중...</p>}
+            {wishError && <p style={{ color: "red" }}>{wishError}</p>}
+            {!wishLoading && wishlistItems.length === 0 && <p style={{ color: "#999" }}>찜한 작품이 없습니다.</p>}
+            {wishlistItems.map((item) => (
+              <MyPage.Product
+                key={item.wishlistId}
+                id={item.artworkId}
+                title={item.title}
+                price={item.price}
+                image={item.thumbnailImageUrl}
+              />
+            ))}
           </MyPage.Section>
 
-          {/* 2-3. ✅ 장바구니 섹션 */}
+          {/* 장바구니 섹션 */}
           <MyPage.Section title={`카트 (${cartItems.length})`}>
-            {cartLoading && <p>장바구니 불러오는 중...</p>}
-
-            {cartError && (
-              <p style={{ color: "red" }}>
-                장바구니를 불러오는 중 오류가 발생했습니다: {cartError}
-              </p>
+            {cartItems.length > 0 && (
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <OrderAllButton onClick={handleOrderAll}>
+                  전체 상품 주문하기
+                </OrderAllButton>
+              </div>
             )}
-
-            {!cartLoading && !cartError && cartItems.length === 0 && (
-              <p style={{ fontSize: "14px", color: "#999" }}>
-                장바구니가 비어 있습니다.
-              </p>
-            )}
-
-            {!cartLoading &&
-              !cartError &&
-              cartItems.map((item) => (
-                <MyPage.Product
-                  key={item.cartItemId}
-                  id={item.artworkId}
-                  title={item.title}
-                  date={"-"} // ✅ CartResponse에 날짜 필드가 없어서 표시 불가
-                  price={Number(item.price)}
-                  image={item.thumbnailImageUrl}
-                />
-              ))}
-
-            {!cartLoading && !cartError && cart && (
-              <p style={{ marginTop: "12px", fontWeight: "bold" }}>
-                총액: {Number(cart.totalAmount).toLocaleString()}₩
-              </p>
-            )}
+            
+            {cartLoading && <p>불러오는 중...</p>}
+            {cartItems.length === 0 && <p style={{ color: "#999" }}>장바구니가 비어 있습니다.</p>}
+            {cartItems.map((item) => (
+              <MyPage.Product
+                key={item.cartItemId}
+                id={item.artworkId}
+                title={item.title}
+                price={Number(item.price)}
+                image={item.thumbnailImageUrl}
+              >
+                <DeleteButton onClick={() => removeItem(item.cartItemId)}>
+                  삭제
+                </DeleteButton>
+              </MyPage.Product>
+            ))}
           </MyPage.Section>
 
-          {/* 2-4. 구매 이력 섹션 (더미) */}
+          {/* 구매 이력 섹션 */}
           <MyPage.Section title="구매 이력">
             <PurchaseHistoryContent />
           </MyPage.Section>
 
-          {/* 2-5. ✅ 문의사항 섹션 (API 연동) */}
+          {/* 문의 사항 섹션 */}
           <MyPage.Section title={`문의사항 (${inquiryItems.length})`}>
-            
-            {inquiryLoading && <p>문의 내역 불러오는 중...</p>}
-
-            {inquiryError && (
-              <p style={{ color: "red" }}>
-                문의 내역을 불러오는 중 오류가 발생했습니다: {inquiryError}
-              </p>
-            )}
-
-            {!inquiryLoading && !inquiryError && inquiryItems.length === 0 && (
-              <p style={{ fontSize: "14px", color: "#999" }}>
-                문의 이력이 없습니다.
-              </p>
-            )}
-
-            {!inquiryLoading &&
-              !inquiryError &&
-              inquiryItems.map((q) => (
-                <MyPage.Product
-                  key={q.inquiryId}
-                  id={q.inquiryId}
-                  title={q.title}
-                  date={new Date(q.createdAt).toLocaleDateString()}
-                  // ✅ 문의는 price/image 없음 (MyPage.Product가 optional 처리돼 있어야 함)
-                />
-              ))}
+            {inqLoading && <p>불러오는 중...</p>}
+            {inqError && <p style={{ color: "red" }}>{inqError}</p>}
+            {!inqLoading && inquiryItems.length === 0 && <p style={{ color: "#999" }}>문의 이력이 없습니다.</p>}
+            {inquiryItems.map((q) => (
+              <MyPage.Product
+                key={q.inquiryId}
+                id={q.inquiryId}
+                titleLabel="문의제목"
+                title={q.title}
+                dateLabel="문의일"
+                date={new Date(q.createdAt).toLocaleDateString()}
+                hideImage={true}
+              />
+            ))}
           </MyPage.Section>
+
         </MyPage.Content>
       </MyPage>
     </PageWrapper>
