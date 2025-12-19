@@ -30,7 +30,6 @@ export const useMyOrders = () => {
       setError(null);
 
       try {
-        // axiosInstance.baseURL="/api" 이므로 "/orders/me" -> "/api/orders/me"
         const res = await axiosInstance.get<OrderHistoryItem[]>("/orders/my");
         setOrders(Array.isArray(res.data) ? res.data : []);
       } catch (e: any) {
