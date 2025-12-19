@@ -1,6 +1,6 @@
-// src/components/MyPage/MyPageLayout.tsx
 import React from "react";
 import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../context/AuthContext";
 import { MyPage } from "./MyPage";
@@ -17,7 +17,6 @@ const PageWrapper = styled.div`
   background-color: #fff;
 `;
 
-// 삭제 버튼 전용 스타일 (styled-components)
 const DeleteButton = styled.button`
   background: none;
   border: 1px solid #ddd;
@@ -34,6 +33,29 @@ const DeleteButton = styled.button`
   }
 `;
 
+const OrderAllButton = styled.button`
+  background-color: #222;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  transition: background 0.2s;
+  
+  &:hover {
+    background-color: #444;
+  }
+
+  &:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+`;
+
+// --- 구매이력 콘텐츠 컴포넌트 ---
 const PurchaseHistoryContent: React.FC = () => {
   const { orders, isLoading, error } = useMyOrders();
 
@@ -64,23 +86,51 @@ const PurchaseHistoryContent: React.FC = () => {
   );
 };
 
+// --- 메인 레이아웃 컴포넌트 ---
 export const MyPageLayout: React.FC = () => {
+  const navigate = useNavigate();
   const { userEmail } = useAuth();
   
   const { wishlist, isLoading: wishLoading, error: wishError } = useMyWishlist();
   const wishlistItems = Array.isArray(wishlist) ? wishlist : [];
 
-  // 🌟 removeItem 함수 추가 추출
-  const { cart, isLoading: cartLoading, removeItem } = useMyCart();
+  const { cart, isLoading: cartLoading, removeItem, checkout } = useMyCart();
   const cartItems = cart?.items ?? [];
 
   const { inquiries, isLoading: inqLoading, error: inqError } = useMyInquiries();
   const inquiryItems = Array.isArray(inquiries) ? inquiries : [];
 
+  // 🎯 전체 주문 처리 핸들러
+  const handleOrderAll = async () => {
+    if (cartItems.length === 0) return;
+    if (!cart?.userId) {
+      alert("로그인 세션이 만료되었습니다. 다시 로그인해주세요.");
+      return;
+    }
+
+    if (!window.confirm(`총 ${cartItems.length}개의 작품을 결제하시겠습니까?`)) return;
+
+    try {
+      // 배송지 정보는 실제 서비스에서 폼 입력을 받아야 하지만, 여기서는 기본값을 사용합니다.
+      const request = {
+        shippingAddress: "등록된 기본 배송지",
+        receiverName: "구매자",
+        receiverPhone: "010-0000-0000"
+      };
+
+      await checkout(cart.userId, request);
+      alert("주문이 정상적으로 완료되었습니다!");
+      window.location.reload(); // 상태 업데이트를 위해 새로고침 혹은 navigate 활용
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
   return (
     <PageWrapper>
       <MyPage>
         <MyPage.Content>
+          {/* 상단 대시보드 */}
           <TopDashboard>
             <InfoCard>
               <h3>회원 정보</h3>
@@ -92,7 +142,7 @@ export const MyPageLayout: React.FC = () => {
             <MyPage.Order /> 
           </TopDashboard>
 
-          {/* 찜 목록 */}
+          {/* 찜 목록 섹션 */}
           <MyPage.Section title={`찜 목록 (${wishlistItems.length})`}>
             {wishLoading && <p>불러오는 중...</p>}
             {wishError && <p style={{ color: "red" }}>{wishError}</p>}
@@ -108,8 +158,16 @@ export const MyPageLayout: React.FC = () => {
             ))}
           </MyPage.Section>
 
-          {/* 장바구니 */}
+          {/* 장바구니 섹션 */}
           <MyPage.Section title={`카트 (${cartItems.length})`}>
+            {cartItems.length > 0 && (
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <OrderAllButton onClick={handleOrderAll}>
+                  전체 상품 주문하기
+                </OrderAllButton>
+              </div>
+            )}
+            
             {cartLoading && <p>불러오는 중...</p>}
             {cartItems.length === 0 && <p style={{ color: "#999" }}>장바구니가 비어 있습니다.</p>}
             {cartItems.map((item) => (
@@ -119,7 +177,6 @@ export const MyPageLayout: React.FC = () => {
                 title={item.title}
                 price={Number(item.price)}
                 image={item.thumbnailImageUrl}
-                // 🌟 삭제 버튼 추가 (MyPage.Product 컴포넌트 내부에 children을 렌더링하도록 구현되어 있어야 함)
               >
                 <DeleteButton onClick={() => removeItem(item.cartItemId)}>
                   삭제
@@ -128,15 +185,16 @@ export const MyPageLayout: React.FC = () => {
             ))}
           </MyPage.Section>
 
-          {/* 구매 이력 */}
+          {/* 구매 이력 섹션 */}
           <MyPage.Section title="구매 이력">
             <PurchaseHistoryContent />
           </MyPage.Section>
 
-          {/* 문의 사항 */}
+          {/* 문의 사항 섹션 */}
           <MyPage.Section title={`문의사항 (${inquiryItems.length})`}>
             {inqLoading && <p>불러오는 중...</p>}
-            {inquiryItems.length === 0 && <p style={{ color: "#999" }}>문의 이력이 없습니다.</p>}
+            {inqError && <p style={{ color: "red" }}>{inqError}</p>}
+            {!inqLoading && inquiryItems.length === 0 && <p style={{ color: "#999" }}>문의 이력이 없습니다.</p>}
             {inquiryItems.map((q) => (
               <MyPage.Product
                 key={q.inquiryId}

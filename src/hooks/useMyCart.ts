@@ -18,18 +18,23 @@ export interface CartResponse {
   totalAmount: number;
 }
 
+// 주문 요청 시 필요한 데이터 타입 (백엔드 DTO와 일치)
+export interface OrderCheckoutRequest {
+  shippingAddress: string;
+  receiverName: string;
+  receiverPhone: string;
+}
+
 export const useMyCart = () => {
   const [cart, setCart] = useState<CartResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // 1. 데이터 패칭 로직을 함수로 분리
   const fetchCart = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
       const res = await axiosInstance.get<CartResponse>("/v1/cart");
-
       const safeCart: CartResponse = {
         ...res.data,
         items: res.data.items ?? [],
@@ -43,15 +48,10 @@ export const useMyCart = () => {
     }
   }, []);
 
-  // 2. 삭제 로직 추가
   const removeItem = async (cartItemId: number) => {
     if (!window.confirm("정말 삭제하시겠습니까?")) return;
-
     try {
-      // 서버에 삭제 요청 (CartController @DeleteMapping("/items/{cartItemId}"))
       await axiosInstance.delete(`/v1/cart/items/${cartItemId}`);
-      
-      // 성공 시 UI 즉시 반영 (다시 불러오기)
       await fetchCart();
       alert("삭제되었습니다.");
     } catch (e: any) {
@@ -60,9 +60,22 @@ export const useMyCart = () => {
     }
   };
 
+  // 🎯 장바구니 -> 주문 생성 (Checkout) 로직 추가
+  const checkout = async (userId: number, request: OrderCheckoutRequest) => {
+    try {
+      // 백엔드: @PostMapping("/api/orders/checkout/{userId}") 호출
+      const res = await axiosInstance.post(`/api/orders/checkout/${userId}`, request);
+      await fetchCart(); // 주문 후 장바구니 비워짐 반영
+      return res.data;
+    } catch (e: any) {
+      const msg = e?.response?.data?.message ?? "주문 처리 중 오류가 발생했습니다.";
+      throw new Error(msg);
+    }
+  };
+
   useEffect(() => {
     fetchCart();
   }, [fetchCart]);
 
-  return { cart, isLoading, error, removeItem, refresh: fetchCart };
+  return { cart, isLoading, error, removeItem, checkout, refresh: fetchCart };
 };

@@ -45,10 +45,6 @@ const CheckoutPage: React.FC = () => {
                   style={{ flexGrow: 1 }}
                   required
                 />
-                {/* 예시: 휴대폰 인증 버튼 */}
-                <button type="button" style={{ padding: "10px 15px" }}>
-                  인증
-                </button>
               </Checkout.InputGroup>
               <Checkout.InputGroup label="이메일">
                 <Checkout.InputField
@@ -84,11 +80,8 @@ const CheckoutPage: React.FC = () => {
               <Checkout.InputGroup label="주소">
                 <Checkout.InputField
                   placeholder="우편번호"
-                  style={{ maxWidth: "100px" }}
+                  style={{ maxWidth: "200px" }}
                 />
-                <button type="button" style={{ padding: "10px 15px" }}>
-                  주소 검색
-                </button>
               </Checkout.InputGroup>
               <Checkout.InputGroup label="상세주소">
                 <Checkout.InputField
