@@ -1,4 +1,3 @@
-// src/components/Checkout/Checkout.tsx
 import React, { ReactNode } from "react";
 import {
   LayoutContainer,
@@ -13,35 +12,31 @@ import {
   ProductSummaryBlock,
   ProductInfo,
   SummaryColumn,
+  SummaryBox,
   SummaryRow,
   FinalPrice,
   FinalButton,
   PaymentMethod,
   RadioLabel,
+  SideSection,
+  SideInfoText,
+  AgreementSection,
 } from "./CheckoutStyles";
-import {
-  DUMMY_PRODUCTS,
-  DUMMY_SUMMARY,
-  ProductItem,
-  OrderSummaryData,
-} from "../data/CheckoutData";
+import { ProductItem, OrderSummaryData } from "../data/CheckoutData";
 
 // --- 하위 컴포넌트 정의 ---
 
-// 1. 상품 요약 정보
-const ProductSummary: React.FC<{ products: ProductItem[] }> = ({
-  products,
-}) => (
+const ProductSummary: React.FC<{ products: ProductItem[] }> = ({ products }) => (
   <ProductSummaryBlock>
-    <SectionTitle>주문 / 결제</SectionTitle>
+    <SectionTitle>注文・お支払い</SectionTitle>
     {products.map((p) => (
       <ProductInfo key={p.id}>
-        <div>{/* Image Placeholder */}</div>
         <div>
-          <p>[미등록] {p.title}</p>
-          <p>
-            {p.year}. {p.size}
-          </p>
+          <img src={p.thumbnail} alt={p.title} />
+        </div>
+        <div>
+          <p>{p.title}</p>
+          <p>{p.year}, {p.artist}</p>
           <span>{p.price.toLocaleString()}원</span>
         </div>
       </ProductInfo>
@@ -49,73 +44,96 @@ const ProductSummary: React.FC<{ products: ProductItem[] }> = ({
   </ProductSummaryBlock>
 );
 
-// 2. 입력 필드 그룹
-const InputGroup: React.FC<{ label: string; children: ReactNode }> = ({
-  label,
-  children,
-}) => (
+const InputGroup: React.FC<{ label: string; children: ReactNode }> = ({ label, children }) => (
   <FormRow>
     <label>{label}</label>
     <div>{children}</div>
   </FormRow>
 );
 
-// 3. 결제 방법 선택
 const PaymentSelection: React.FC = () => (
   <InfoBlock>
-    <SectionTitle>결제 진행</SectionTitle>
-    <PaymentMethod>
+    <SectionTitle>결제정보</SectionTitle>
+    <PaymentMethod style={{ flexDirection: "row", gap: "30px" }}>
       <RadioLabel>
         <input type="radio" name="payment" defaultChecked />
-        신용카드 결제
+        카드 결제
       </RadioLabel>
       <RadioLabel>
         <input type="radio" name="payment" />
-        계좌 이체 (실시간)
+        실시간 계좌이체
       </RadioLabel>
       <RadioLabel>
-        <input type="radio" name="payment" disabled />
-        무통장 입금 (미지원)
+        <input type="radio" name="payment" />
+        무통장 입금
       </RadioLabel>
     </PaymentMethod>
   </InfoBlock>
 );
 
-// 4. 우측 최종 결제 요약
-const FinalSummary: React.FC<{ summary: OrderSummaryData }> = ({ summary }) => (
+// 4. 우측 최종 결제 요약 (사진의 주문자 정보 + 배송안내 + 결제박스 포함)
+const FinalSummary: React.FC<{ summary: OrderSummaryData; userEmail?: string }> = ({ 
+  summary, 
+  userEmail="시발럼"
+}) => (
   <SummaryColumn>
-    <SectionTitle>총 결제 금액</SectionTitle>
+    <SummaryBox>
+    {/* 주문자 정보 섹션 */}
+    <SideSection>
+      <SectionTitle>주문자 정보</SectionTitle>
+      <p style={{ fontSize: "14px", color: "#333" }}>{userEmail}</p>
+    </SideSection>
 
-    <SummaryRow>
-      <span>상품 금액 합계</span>
-      <span>{summary.subtotal.toLocaleString()}원</span>
-    </SummaryRow>
-    <SummaryRow>
-      <span>배송비</span>
-      <span>{summary.shippingFee.toLocaleString()}원</span>
-    </SummaryRow>
-    <SummaryRow>
-      <span>할인 금액</span>
-      <span>{summary.discount.toLocaleString()}원</span>
-    </SummaryRow>
+    {/* 배송 안내 섹션 */}
+    <SideSection style={{marginBottom: "100px"}}>
+      <SideInfoText>
+        <h4>택배 배송</h4>
+        <p>택배 배송이 가능한 작품들은 1만원의 포장 및 배송료가 부과됩니다.</p>
+      </SideInfoText>
+      <SideInfoText>
+        <h4>착불 배송</h4>
+        <p>택배 배송이 불가한 작품(부피, 무게 초과)의 경우 미술품 전문차량으로 개별 배송되며...</p>
+      </SideInfoText>
+      <SideInfoText>
+        <h4>개별 배송</h4>
+        <p>개별 배송되는 작품은 미술품 전문배송차량으로 개별 배송됩니다. (무료서비스)</p>
+      </SideInfoText>
+    </SideSection>
+    </SummaryBox>
+    {/* 결제 요약 박스 */}
+    <SummaryBox>
+      <SectionTitle style={{ border: "none", marginBottom: "10px" }}>총 결제금액</SectionTitle>
+      <FinalPrice>{summary.totalAmount.toLocaleString()}원</FinalPrice>
 
-    <FinalPrice>{summary.totalAmount.toLocaleString()}원</FinalPrice>
+      <SummaryRow>
+        <span>총 상품금액</span>
+        <span>{summary.subtotal.toLocaleString()}원</span>
+      </SummaryRow>
+      <SummaryRow>
+        <span>배송비</span>
+        <span>{summary.shippingFee.toLocaleString()}원</span>
+      </SummaryRow>
 
-    <p style={{ fontSize: "12px", color: "#666", marginTop: "15px" }}>
-      * 상품의 상세 정보와 결제 금액을 확인하였으며, 구매에 동의합니다.
-    </p>
+      <AgreementSection>
+        <label>
+          <input type="checkbox" /> <strong>전체동의</strong>
+        </label>
+        <div className="sub-agreement">
+          <label><input type="checkbox" /> Arto 구매약관 동의</label>
+          <label><input type="checkbox" /> 개인정보수집 및 이용, 제3자 제공/위탁 동의</label>
+          <label><input type="checkbox" /> 위 상품의 구매조건 확인 및 결제진행 동의</label>
+        </div>
+      </AgreementSection>
 
-    <FinalButton>결제 진행</FinalButton>
+      <FinalButton>결제하기</FinalButton>
+    </SummaryBox>
   </SummaryColumn>
 );
-
-// --- Compound Component 구성 ---
 
 interface CheckoutLayoutProps {
   children: ReactNode;
 }
 
-// Base Component: 메인 Grid 레이아웃을 정의
 const CheckoutLayoutBase: React.FC<CheckoutLayoutProps> = ({ children }) => {
   return (
     <LayoutContainer>
@@ -124,71 +142,13 @@ const CheckoutLayoutBase: React.FC<CheckoutLayoutProps> = ({ children }) => {
   );
 };
 
-// 하위 컴포넌트들을 Base에 연결
 export const Checkout = Object.assign(CheckoutLayoutBase, {
-  // 상품 및 입력 섹션 (Left Column)
   InputColumn: InputColumn,
   Product: ProductSummary,
   InputGroup: InputGroup,
   InputField: InputField,
   Select: SelectBox,
-
-  // 결제 방식
   Payment: PaymentSelection,
-
-  // 결제 요약 섹션 (Right Column)
   SummaryColumn: SummaryColumn,
   FinalSummary: FinalSummary,
 });
-
-// --- 최종 사용 예시 (pages/CheckoutPage.tsx) ---
-/*
-const CheckoutPage: React.FC = () => {
-    return (
-        <Checkout.Layout>
-            <Checkout.InputColumn>
-                <Checkout.Product products={DUMMY_PRODUCTS} />
-
-                <SectionWrapper>
-                    <SectionTitle>주문자 정보</SectionTitle>
-                    <Checkout.InputGroup label="이름">
-                        <Checkout.InputField placeholder="이름" />
-                    </Checkout.InputGroup>
-                    <Checkout.InputGroup label="연락처">
-                        <Checkout.Select>
-                            <option>010</option>
-                        </Checkout.Select>
-                        <Checkout.InputField placeholder="전화번호" />
-                    </Checkout.InputGroup>
-                    <Checkout.InputGroup label="이메일">
-                        <Checkout.InputField placeholder="이메일" />
-                    </Checkout.InputGroup>
-                </SectionWrapper>
-                
-                <SectionWrapper>
-                    <SectionTitle>배송지 정보</SectionTitle>
-                    <Checkout.InputGroup label="수령인">
-                        <Checkout.InputField placeholder="수령인" />
-                    </Checkout.InputGroup>
-                    <Checkout.InputGroup label="주소">
-                        <Checkout.InputField placeholder="우편번호" style={{maxWidth: '100px'}}/>
-                        <button>검색</button>
-                    </Checkout.InputGroup>
-                    <Checkout.InputGroup label="상세주소">
-                         <Checkout.InputField placeholder="기본 주소" />
-                         <Checkout.InputField placeholder="상세 주소" />
-                    </Checkout.InputGroup>
-                </SectionWrapper>
-
-                <Checkout.Payment />
-            </Checkout.InputColumn>
-
-            <Checkout.SummaryColumn>
-                <Checkout.FinalSummary summary={DUMMY_SUMMARY} />
-            </Checkout.SummaryColumn>
-        </Checkout.Layout>
-    );
-};
-
-export default CheckoutPage;
-*/

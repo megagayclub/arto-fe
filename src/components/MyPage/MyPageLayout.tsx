@@ -1,6 +1,6 @@
-// src/components/MyPage/MyPageLayout.tsx
 import React from "react";
 import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../context/AuthContext";
 import { MyPage } from "./MyPage";
@@ -17,7 +17,6 @@ const PageWrapper = styled.div`
   background-color: #fff;
 `;
 
-// 삭제 버튼 전용 스타일 (styled-components)
 const DeleteButton = styled.button`
   background: none;
   border: 1px solid #ddd;
@@ -34,8 +33,21 @@ const DeleteButton = styled.button`
   }
 `;
 
-const PurchaseHistoryContent: React.FC = () => {
-  const { orders, isLoading, error } = useMyOrders();
+const OrderAllButton = styled.button`
+  background-color: #222;
+  color: #fff;
+  border: none;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-top: 17px;
+  transition: background 0.2s;
+  
+  &:hover {
+    background-color: #444;
+  }
 
   if (isLoading) return <p>注文履歴を読み込み中...</p>;
 
@@ -46,7 +58,23 @@ const PurchaseHistoryContent: React.FC = () => {
       </p>
     );
   }
+`;
 
+const OrderPrice = styled.div`
+  color: #363636ff;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 17px; 
+`
+
+// --- 구매이력 콘텐츠 컴포넌트 ---
+const PurchaseHistoryContent: React.FC = () => {
+  const { orders, isLoading, error } = useMyOrders();
+
+  if (isLoading) return <p>구매 이력 불러오는 중...</p>;
+  if (error) return <p style={{ color: "red" }}>오류 발생: {error}</p>;
   if (!orders || orders.length === 0) {
     return (
       <div style={{ textAlign: "center", padding: "30px 0", color: "#999" }}>
@@ -57,14 +85,6 @@ const PurchaseHistoryContent: React.FC = () => {
       </div>
     );
   }
-
-  const toNumber = (v: any) => (typeof v === "number" ? v : Number(v));
-
-  const formatDate = (v?: string | null) => {
-    if (!v) return "";
-    const d = new Date(v);
-    return isNaN(d.getTime()) ? v : d.toLocaleDateString();
-  };
 
   return (
     <>
@@ -99,7 +119,9 @@ const PurchaseHistoryContent: React.FC = () => {
   );
 };
 
+// --- 메인 레이아웃 컴포넌트 ---
 export const MyPageLayout: React.FC = () => {
+  const navigate = useNavigate();
   const { userEmail } = useAuth();
   
   const { wishlist, isLoading: wishLoading, error: wishError } = useMyWishlist();
@@ -111,10 +133,19 @@ export const MyPageLayout: React.FC = () => {
   const { inquiries, isLoading: inqLoading, error: inqError } = useMyInquiries();
   const inquiryItems = Array.isArray(inquiries) ? inquiries : [];
 
+  // 💰 장바구니 총액 계산 로직
+  const totalCartPrice = cartItems.reduce((acc, item) => acc + Number(item.price), 0);
+
+  // 주문 처리 핸들러
+  const handleOrderAll = async () => {
+    navigate("/checkout/")
+  };
+
   return (
     <PageWrapper>
       <MyPage>
         <MyPage.Content>
+          {/* 상단 대시보드 */}
           <TopDashboard>
             <InfoCard>
               <h3>会員情報</h3>
@@ -163,6 +194,18 @@ export const MyPageLayout: React.FC = () => {
                 </DeleteButton>
               </MyPage.Product>
             ))}
+            
+            {cartItems.length > 0 && (
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <OrderPrice>
+                  총 <span>{totalCartPrice.toLocaleString()}원</span>
+
+                </OrderPrice>
+                <OrderAllButton onClick={handleOrderAll}>
+                   주문하기
+                </OrderAllButton>
+              </div>
+            )}
           </MyPage.Section>
 
           {/* 구매 이력 */}
