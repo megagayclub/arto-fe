@@ -33,7 +33,7 @@ const ProductSummary: React.FC<{ products: ProductItem[] }> = ({
   products,
 }) => (
   <ProductSummaryBlock>
-    <SectionTitle>주문 / 결제</SectionTitle>
+    <SectionTitle>注文・お支払い</SectionTitle>
     {products.map((p) => (
       <ProductInfo key={p.id}>
         <div>{/* Image Placeholder */}</div>
