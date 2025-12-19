@@ -1,16 +1,21 @@
-// vite.config.ts 파일
-
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
 
-  // ⬇️ 아래 'server' 객체를 추가하거나 수정하세요 ⬇️
   server: {
-    // blocked request 에러를 해결하기 위해 호스트를 명시적으로 허용합니다.
+    // 1️⃣ 포트를 5173으로 강제 고정합니다.
+    port: 5173, 
+    
+    // 2️⃣ 모든 네트워크 인터페이스에서 접속 가능하게 설정 (npm run dev 시 출력된 IP들 허용)
+    host: "0.0.0.0", 
+
+    // 3️⃣ 호스트 허용 설정 (기존 코드 유지)
     allowedHosts: [
-      "s9yf3j-5173.csb.app", // 👈 에러 메시지에 표시된 호스트 이름
+      "s9yf3j-5173.csb.app", 
+      "localhost",
+      "127.0.0.1"
     ],
 
  proxy: {
@@ -33,8 +38,6 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       },
-
     },
   },
-  // ----------------------------------------------
 });

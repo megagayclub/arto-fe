@@ -141,6 +141,32 @@ export const MyPageLayout: React.FC = () => {
     navigate("/checkout/")
   };
 
+  // 🎯 전체 주문 처리 핸들러
+  const handleOrderAll = async () => {
+    if (cartItems.length === 0) return;
+    if (!cart?.userId) {
+      alert("로그인 세션이 만료되었습니다. 다시 로그인해주세요.");
+      return;
+    }
+
+    if (!window.confirm(`총 ${cartItems.length}개의 작품을 결제하시겠습니까?`)) return;
+
+    try {
+      // 배송지 정보는 실제 서비스에서 폼 입력을 받아야 하지만, 여기서는 기본값을 사용합니다.
+      const request = {
+        shippingAddress: "등록된 기본 배송지",
+        receiverName: "구매자",
+        receiverPhone: "010-0000-0000"
+      };
+
+      await checkout(cart.userId, request);
+      alert("주문이 정상적으로 완료되었습니다!");
+      window.location.reload(); // 상태 업데이트를 위해 새로고침 혹은 navigate 활용
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
   return (
     <PageWrapper>
       <MyPage>
@@ -206,6 +232,22 @@ export const MyPageLayout: React.FC = () => {
                 </OrderAllButton>
               </div>
             )}
+            
+            {cartLoading && <p>불러오는 중...</p>}
+            {cartItems.length === 0 && <p style={{ color: "#999" }}>장바구니가 비어 있습니다.</p>}
+            {cartItems.map((item) => (
+              <MyPage.Product
+                key={item.cartItemId}
+                id={item.artworkId}
+                title={item.title}
+                price={Number(item.price)}
+                image={item.thumbnailImageUrl}
+              >
+                <DeleteButton onClick={() => removeItem(item.cartItemId)}>
+                  삭제
+                </DeleteButton>
+              </MyPage.Product>
+            ))}
           </MyPage.Section>
 
           {/* 구매 이력 */}

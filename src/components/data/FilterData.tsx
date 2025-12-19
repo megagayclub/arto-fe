@@ -13,23 +13,22 @@ export interface FilterIcon {
 }
 
 export const MAIN_FILTER_ICONS: FilterIcon[] = [
-  { id: "space", icon: <HiHomeModern />, label: "dd" },
-  { id: "mood", icon: <GiBedLamp />, label: "분위기" },
-  { id: "won", icon: "₩", label: "가격" },
-  { id: "size", icon: <FaRulerCombined />, label: "크기" },
-  { id: "shape", icon: <FaShapes />, label: "형태" },
-  { id: "color", icon: <IoIosColorPalette />, label: "색상" },
-  { id: "ship", icon: <MdLocalShipping />, label: "기타" },
-  { id: "reset", icon: "↺", label: "초기화" },
+  { id: "space", icon: <HiHomeModern />, label: "空間" },
+  { id: "mood", icon: <GiBedLamp />, label: "雰囲気" },
+  { id: "won", icon: "₩", label: "価格" },
+  { id: "size", icon: <FaRulerCombined />, label: "サイズ" },
+  { id: "shape", icon: <FaShapes />, label: "形" },
+  { id: "color", icon: <IoIosColorPalette />, label: "色" },
+  { id: "ship", icon: <MdLocalShipping />, label: "その他" },
+  { id: "reset", icon: "↺", label: "リセット" },
 ];
 
 export const SPACE_OPTIONS = [
-  { label: "リビング", value: 1 }, 
+  { label: "リビング", value: 1 },
   { label: "寝室", value: 2 },
   { label: "キッチン", value: 3 },
   { label: "オフィス", value: 4 },
   { label: "玄関", value: 5 }
-
 ];
 
 export const MOOD_OPTIONS = [
@@ -43,15 +42,15 @@ export const MOOD_OPTIONS = [
 export const ETC_OPTIONS = [
   { label: "送料無料", value: "FREE_SHIPPING" },
   { label: "着払い", value: "CASH_ON_DELIVERY" },
-  { label: "即日配送", value: "PARCEL" },
+  { label: "クイック配送", value: "PARCEL" },
 ];
 
 export const MORPH_OPTIONS = [
-  { label: "縦長長方形", value: "VERTICAL_RECTANGLE" },
-  { label: "横長長方形", value: "HORIZONTAL_RECTANGLE" },
+  { label: "縦長の長方形", value: "VERTICAL_RECTANGLE" },
+  { label: "横長の長方形", value: "HORIZONTAL_RECTANGLE" },
   { label: "円形", value: "CIRCLE" },
   { label: "正方形", value: "SQUARE" },
-  { label: "分割型", value: "DIVIDED" },
+  { label: "分割", value: "DIVIDED" },
   { label: "立体的", value: "THREE_DIMENSIONAL" },
   { label: "不定形", value: "IRREGULAR" },
 ];
@@ -63,7 +62,7 @@ export const COLOR_OPTIONS = [
   { hex: "#FFFF00", name: "Yellow", value: 3 },
   { hex: "#008000", name: "Green", value: 4 },
   { hex: "#0000FF", name: "Blue", value: 5 },
-  { hex: "#000080", name: "Black", value: 6 },
-  { hex: "#800080;", name: "White", value: 7 },
+  { hex: "#000000", name: "Black", value: 6 },
+  { hex: "#FFFFFF", name: "White", value: 7 },
 ];
 

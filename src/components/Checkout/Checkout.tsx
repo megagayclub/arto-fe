@@ -32,12 +32,11 @@ const ProductSummary: React.FC<{ products: ProductItem[] }> = ({ products }) => 
     {products.map((p) => (
       <ProductInfo key={p.id}>
         <div>
-          <img src={p.thumbnail} alt={p.title} />
-        </div>
-        <div>
-          <p>{p.title}</p>
-          <p>{p.year}, {p.artist}</p>
-          <span>{p.price.toLocaleString()}원</span>
+          <p>[未登録] {p.title}</p>
+          <p>
+            {p.year}. {p.size}
+          </p>
+          <span>{p.price.toLocaleString()}円</span>
         </div>
       </ProductInfo>
     ))}
@@ -53,19 +52,19 @@ const InputGroup: React.FC<{ label: string; children: ReactNode }> = ({ label, c
 
 const PaymentSelection: React.FC = () => (
   <InfoBlock>
-    <SectionTitle>결제정보</SectionTitle>
-    <PaymentMethod style={{ flexDirection: "row", gap: "30px" }}>
+    <SectionTitle>お支払い方法</SectionTitle>
+    <PaymentMethod>
       <RadioLabel>
         <input type="radio" name="payment" defaultChecked />
-        카드 결제
+        クレジットカード決済
       </RadioLabel>
       <RadioLabel>
         <input type="radio" name="payment" />
-        실시간 계좌이체
+        口座振替（リアルタイム）
       </RadioLabel>
       <RadioLabel>
-        <input type="radio" name="payment" />
-        무통장 입금
+        <input type="radio" name="payment" disabled />
+        銀行振込（未対応）
       </RadioLabel>
     </PaymentMethod>
   </InfoBlock>
@@ -77,56 +76,28 @@ const FinalSummary: React.FC<{ summary: OrderSummaryData; userEmail?: string }> 
   userEmail="시발럼"
 }) => (
   <SummaryColumn>
-    <SummaryBox>
-    {/* 주문자 정보 섹션 */}
-    <SideSection>
-      <SectionTitle>주문자 정보</SectionTitle>
-      <p style={{ fontSize: "14px", color: "#333" }}>{userEmail}</p>
-    </SideSection>
+    <SectionTitle>お支払い合計金額</SectionTitle>
 
-    {/* 배송 안내 섹션 */}
-    <SideSection style={{marginBottom: "100px"}}>
-      <SideInfoText>
-        <h4>택배 배송</h4>
-        <p>택배 배송이 가능한 작품들은 1만원의 포장 및 배송료가 부과됩니다.</p>
-      </SideInfoText>
-      <SideInfoText>
-        <h4>착불 배송</h4>
-        <p>택배 배송이 불가한 작품(부피, 무게 초과)의 경우 미술품 전문차량으로 개별 배송되며...</p>
-      </SideInfoText>
-      <SideInfoText>
-        <h4>개별 배송</h4>
-        <p>개별 배송되는 작품은 미술품 전문배송차량으로 개별 배송됩니다. (무료서비스)</p>
-      </SideInfoText>
-    </SideSection>
-    </SummaryBox>
-    {/* 결제 요약 박스 */}
-    <SummaryBox>
-      <SectionTitle style={{ border: "none", marginBottom: "10px" }}>총 결제금액</SectionTitle>
-      <FinalPrice>{summary.totalAmount.toLocaleString()}원</FinalPrice>
+    <SummaryRow>
+      <span>商品合計金額</span>
+      <span>{summary.subtotal.toLocaleString()}원</span>
+    </SummaryRow>
+    <SummaryRow>
+      <span>送料</span>
+      <span>{summary.shippingFee.toLocaleString()}원</span>
+    </SummaryRow>
+    <SummaryRow>
+      <span>割引金額</span>
+      <span>{summary.discount.toLocaleString()}원</span>
+    </SummaryRow>
 
-      <SummaryRow>
-        <span>총 상품금액</span>
-        <span>{summary.subtotal.toLocaleString()}원</span>
-      </SummaryRow>
-      <SummaryRow>
-        <span>배송비</span>
-        <span>{summary.shippingFee.toLocaleString()}원</span>
-      </SummaryRow>
+    <FinalPrice>{summary.totalAmount.toLocaleString()}원</FinalPrice>
 
-      <AgreementSection>
-        <label>
-          <input type="checkbox" /> <strong>전체동의</strong>
-        </label>
-        <div className="sub-agreement">
-          <label><input type="checkbox" /> Arto 구매약관 동의</label>
-          <label><input type="checkbox" /> 개인정보수집 및 이용, 제3자 제공/위탁 동의</label>
-          <label><input type="checkbox" /> 위 상품의 구매조건 확인 및 결제진행 동의</label>
-        </div>
-      </AgreementSection>
+    <p style={{ fontSize: "12px", color: "#666", marginTop: "15px" }}>
+      * 商品の詳細内容およびお支払い金額を確認の上、購入に同意します。
+    </p>
 
-      <FinalButton>결제하기</FinalButton>
-    </SummaryBox>
+    <FinalButton>お支払いへ進む</FinalButton>
   </SummaryColumn>
 );
 
