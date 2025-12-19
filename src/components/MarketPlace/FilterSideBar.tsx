@@ -350,27 +350,6 @@ export const FilterSidebar: React.FC = () => {
   const handleClose = () => setIsPanelOpen(false);
 
   const handleApply = () => {
-    // 1. URLSearchParams를 사용하여 파라미터 문자열 생성
-    const params = new URLSearchParams();
-    
-    if (filters.space) params.append("spaces", filters.space.toString());
-    if (filters.mood) params.append("moods", filters.mood.toString());
-    if (filters.morph) params.append("morph", filters.morph);
-    if (filters.color) params.append("colors", filters.color.toString());
-    
-    // 가격 및 크기 범위
-    params.append("minPrice", filters.won[0].toString());
-    params.append("maxPrice", filters.won[1].toString());
-    params.append("minSize", filters.size[0].toString());
-    params.append("maxSize", filters.size[1].toString());
-
-    // 기타 (배열)
-    if (filters.ship.length > 0) {
-      filters.ship.forEach(s => params.append("etc", s));
-    }
-
-    // 2. 알림창으로 파라미터 출력
-    alert(`백엔드로 전송될 파라미터:\n?${params.toString()}`);
     applyFilters(); // Context에서 가져온 함수 실행
 
     // 3. 패널 닫기
