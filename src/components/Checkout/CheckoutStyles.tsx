@@ -1,21 +1,18 @@
-// src/components/Checkout/CheckoutStyles.ts
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 
-// --- 기본 레이아웃 ---
 export const LayoutContainer = styled.div`
   max-width: 1200px;
   margin: 50px auto;
-  padding: 0 20px;
-  font-family: Arial, sans-serif;
+  padding: 90px 20px;
+  font-family: "Noto Sans KR", Arial, sans-serif;
 `;
 
 export const MainGrid = styled.div`
   display: grid;
-  grid-template-columns: 2fr 1fr; /* 좌측 입력폼 2, 우측 결제요약 1 */
+  grid-template-columns: 2fr 1fr;
   gap: 30px;
 `;
 
-// --- 공통 섹션 스타일 ---
 export const SectionWrapper = styled.div`
   margin-bottom: 30px;
   padding: 20px;
@@ -31,13 +28,9 @@ export const SectionTitle = styled.h2`
   border-bottom: 1px solid #eee;
 `;
 
-// --- 좌측 (입력 및 선택) 영역 ---
-export const InputColumn = styled.div`
-  /* Left Column Container */
-`;
+export const InputColumn = styled.div``;
 
 export const InfoBlock = styled.div`
-  /* 주문자 정보, 배송지 정보 등 */
   margin-bottom: 20px;
 `;
 
@@ -76,7 +69,6 @@ export const SelectBox = styled.select`
   width: 100%;
 `;
 
-// --- 결제 방식 ---
 export const PaymentMethod = styled.div`
   display: flex;
   flex-direction: column;
@@ -92,12 +84,38 @@ export const RadioLabel = styled.label`
   cursor: pointer;
 `;
 
-// --- 우측 (결제 요약) 영역 ---
+// --- 우측 컬럼 전용 추가 스타일 ---
+
 export const SummaryColumn = styled.div`
-  background-color: #f9f9f9;
-  padding: 20px;
-  border: 1px solid #eee;
   height: fit-content;
+`;
+
+export const SideSection = styled.div`
+  margin-bottom: 40px;
+`;
+
+export const SideInfoText = styled.div`
+  margin-bottom: 40px;
+  
+  h4 {
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #333;
+  }
+  
+  p {
+    font-size: 12px;
+    color: #888;
+    line-height: 1.6;
+    margin: 0;
+  }
+`;
+
+export const SummaryBox = styled.div`
+  background-color: #f9f9f9;
+  padding: 25px;
+  border: 1px solid #eee;
 `;
 
 export const SummaryRow = styled.div`
@@ -105,43 +123,67 @@ export const SummaryRow = styled.div`
   justify-content: space-between;
   padding: 8px 0;
   font-size: 14px;
-  border-bottom: 1px dashed #ddd;
+  color: #666;
 
-  &:last-of-type {
-    border-bottom: none;
+  &.total-row {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #ddd;
+    color: #333;
     font-weight: bold;
-    font-size: 16px;
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 2px solid #333;
+    font-size: 18px;
   }
 `;
 
 export const FinalPrice = styled.div`
-  font-size: 26px;
+  font-size: 32px;
   font-weight: bold;
   color: #333;
   text-align: right;
+  margin: 10px 0 30px 0;
+`;
+
+export const AgreementSection = styled.div`
   margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: #333;
+    cursor: pointer;
+  }
+
+  .sub-agreement {
+    padding-left: 26px;
+    font-size: 12px;
+    color: #888;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
 `;
 
 export const FinalButton = styled.button`
   width: 100%;
-  padding: 15px;
-  background-color: #333;
+  padding: 18px;
+  background-color: #000;
   color: #fff;
   border: none;
   font-size: 16px;
   font-weight: bold;
-  margin-top: 20px;
+  margin-top: 30px;
   cursor: pointer;
 
   &:hover {
-    background-color: #555;
+    background-color: #333;
   }
 `;
 
-// --- 상품 요약 ---
 export const ProductSummaryBlock = styled.div`
   padding: 15px 0;
   margin-bottom: 20px;
@@ -150,22 +192,45 @@ export const ProductSummaryBlock = styled.div`
 
 export const ProductInfo = styled.div`
   display: flex;
-  gap: 10px;
+  gap: 15px;
+  margin-bottom: 15px;
 
   div:first-child {
     width: 80px;
     height: 80px;
-    background: #ccc;
+    background: #f4f4f4;
     flex-shrink: 0;
+    overflow: hidden;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  p {
-    font-size: 13px;
-    color: #666;
-  }
-  span {
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
     display: block;
-    font-weight: bold;
-    color: #333;
+  }
+
+  div:last-child {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    
+    p {
+      margin: 0 0 5px 0;
+      font-size: 13px;
+      color: #666;
+      line-height: 1.4;
+    }
+    
+    span {
+      display: block;
+      font-weight: bold;
+      color: #333;
+      font-size: 15px;
+    }
   }
 `;

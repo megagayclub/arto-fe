@@ -37,12 +37,12 @@ const OrderAllButton = styled.button`
   background-color: #222;
   color: #fff;
   border: none;
-  padding: 10px 20px;
+  padding: 12px 24px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   border-radius: 4px;
-  margin-bottom: 15px;
+  margin-top: 17px;
   transition: background 0.2s;
   
   &:hover {
@@ -53,7 +53,21 @@ const OrderAllButton = styled.button`
     background-color: #ccc;
     cursor: not-allowed;
   }
+
+  span {
+    color: #ffcc00; /* 금액 부분 강조색 */
+    margin-right: 4px;
+  }
 `;
+
+const OrderPrice = styled.div`
+  color: #363636ff;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 17px; 
+`
 
 // --- 구매이력 콘텐츠 컴포넌트 ---
 const PurchaseHistoryContent: React.FC = () => {
@@ -94,36 +108,18 @@ export const MyPageLayout: React.FC = () => {
   const { wishlist, isLoading: wishLoading, error: wishError } = useMyWishlist();
   const wishlistItems = Array.isArray(wishlist) ? wishlist : [];
 
-  const { cart, isLoading: cartLoading, removeItem, checkout } = useMyCart();
+  const { cart, isLoading: cartLoading, removeItem } = useMyCart();
   const cartItems = cart?.items ?? [];
 
   const { inquiries, isLoading: inqLoading, error: inqError } = useMyInquiries();
   const inquiryItems = Array.isArray(inquiries) ? inquiries : [];
 
-  // 🎯 전체 주문 처리 핸들러
+  // 💰 장바구니 총액 계산 로직
+  const totalCartPrice = cartItems.reduce((acc, item) => acc + Number(item.price), 0);
+
+  // 주문 처리 핸들러
   const handleOrderAll = async () => {
-    if (cartItems.length === 0) return;
-    if (!cart?.userId) {
-      alert("로그인 세션이 만료되었습니다. 다시 로그인해주세요.");
-      return;
-    }
-
-    if (!window.confirm(`총 ${cartItems.length}개의 작품을 결제하시겠습니까?`)) return;
-
-    try {
-      // 배송지 정보는 실제 서비스에서 폼 입력을 받아야 하지만, 여기서는 기본값을 사용합니다.
-      const request = {
-        shippingAddress: "등록된 기본 배송지",
-        receiverName: "구매자",
-        receiverPhone: "010-0000-0000"
-      };
-
-      await checkout(cart.userId, request);
-      alert("주문이 정상적으로 완료되었습니다!");
-      window.location.reload(); // 상태 업데이트를 위해 새로고침 혹은 navigate 활용
-    } catch (err: any) {
-      alert(err.message);
-    }
+    navigate("/checkout/")
   };
 
   return (
@@ -160,14 +156,6 @@ export const MyPageLayout: React.FC = () => {
 
           {/* 장바구니 섹션 */}
           <MyPage.Section title={`카트 (${cartItems.length})`}>
-            {cartItems.length > 0 && (
-              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <OrderAllButton onClick={handleOrderAll}>
-                  전체 상품 주문하기
-                </OrderAllButton>
-              </div>
-            )}
-            
             {cartLoading && <p>불러오는 중...</p>}
             {cartItems.length === 0 && <p style={{ color: "#999" }}>장바구니가 비어 있습니다.</p>}
             {cartItems.map((item) => (
@@ -183,6 +171,18 @@ export const MyPageLayout: React.FC = () => {
                 </DeleteButton>
               </MyPage.Product>
             ))}
+            
+            {cartItems.length > 0 && (
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <OrderPrice>
+                  총 <span>{totalCartPrice.toLocaleString()}원</span>
+
+                </OrderPrice>
+                <OrderAllButton onClick={handleOrderAll}>
+                   주문하기
+                </OrderAllButton>
+              </div>
+            )}
           </MyPage.Section>
 
           {/* 구매 이력 섹션 */}
