@@ -2,8 +2,10 @@ import React from "react";
 import styled from "styled-components";
 import { useMarket } from "./MarketContext";
 import { useNavigate } from "react-router-dom";
+import { LikeButton } from '../Common/LikeButton';
+import { useLikeToggle } from '../../hooks/useLikeToggle';
 
-// --- 스타일 (기존 디자인 100% 유지) ---
+// --- 스타일 ---
 
 const ListGrid = styled.div`
   display: flex;
@@ -15,6 +17,7 @@ const ListGrid = styled.div`
 `;
 
 const ItemCard = styled.div`
+  position: relative; /* 👈 하트 버튼을 absolute로 배치하기 위해 추가 */
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -23,7 +26,7 @@ const ItemCard = styled.div`
   max-width: 200px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   transition: transform 0.2s;
-  cursor: pointer; /* 마우스 커서 변경 확인 */
+  cursor: pointer;
 
   &:hover {
     transform: translateY(-5px);
@@ -35,11 +38,7 @@ const ItemCard = styled.div`
     height: 250px;
     object-fit: cover;
     margin-bottom: 10px;
-    pointer-events: none; /* 이미지 클릭 방해 금지 */
-  }
-
-  h3, p, strong {
-    pointer-events: none; /* 텍스트 클릭 방해 금지 */
+    /* pointer-events: none; 은 제거하거나 하트 버튼 영역만 예외처리 해야 클릭이 됩니다 */
   }
 
   h3 {
@@ -65,31 +64,53 @@ const ItemCard = styled.div`
   }
 `;
 
-// --- 컴포넌트 ---
+// 하트 버튼 위치 스타일
+const LikeBadge = styled.div`
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+`;
 
+// --- 개별 아이템 컴포넌트 (토글 로직 분리) ---
+const ProductItem: React.FC<{ product: any; onClick: (id: number) => void }> = ({ product, onClick }) => {
+  // 훅 연결 (isLikedByMe는 백엔드 필드명에 맞게 확인 필요)
+  const { isLiked, toggleLike } = useLikeToggle(product.isLikedByMe || false, product.artworkId);
+
+  return (
+    <ItemCard onClick={() => onClick(product.artworkId)}>
+      <LikeBadge>
+        {/* 하트 버튼 클릭 시 카드 상세 이동 방지를 위해 이벤트 버블링은 훅 내부(toggleLike)에서 막고 있습니다 */}
+        <LikeButton isLiked={isLiked} onToggle={toggleLike} />
+      </LikeBadge>
+      
+      <img src={product.thumbnailImageUrl} alt={product.title} />
+      <h3>{product.title}</h3>
+      <p>{product.artistName}</p>
+      {/* 화폐 단위 엔화로 변경 */}
+      <strong>{product.price.toLocaleString()}円</strong>
+    </ItemCard>
+  );
+};
+
+// --- 메인 리스트 컴포넌트 ---
 export const ProductList: React.FC = () => {
   const { products } = useMarket();
   const navigate = useNavigate();
 
-  // 클릭 핸들러를 부모에서 관리
-  const handleItemClick = (id: number | string) => {
-    console.log("클릭된 ID:", id); // 브라우저 콘솔에서 작동 여부 확인용
+  const handleItemClick = (id: number) => {
     navigate(`/product/${id}`);
   };
 
   return (
     <ListGrid>
       {products && products.length > 0 ? (
-        products.map((product, index) => (
-          <ItemCard 
-            key={product.artworkId || index} 
-            onClick={() => handleItemClick(product.artworkId)}
-          >
-            <img src={product.thumbnailImageUrl} alt={product.title} />
-            <h3>{product.title}</h3>
-            <p>{product.artistName}</p>
-            <strong>₩{product.price.toLocaleString()}</strong>
-          </ItemCard>
+        products.map((product) => (
+          <ProductItem 
+            key={product.artworkId} 
+            product={product} 
+            onClick={handleItemClick}
+          />
         ))
       ) : (
         <p>No products found.</p>
