@@ -84,11 +84,12 @@ export const ProductList: React.FC = () => {
           <ItemCard 
             key={product.artworkId || index} 
             onClick={() => handleItemClick(product.artworkId)}
-          >
+    >
             <img src={product.thumbnailImageUrl} alt={product.title} />
             <h3>{product.title}</h3>
             <p>{product.artistName}</p>
-            <strong>₩{product.price.toLocaleString()}</strong>
+            {/* ₩ 기호를 제거하고 숫자 뒤에 円을 추가합니다 */}
+            <strong>{product.price.toLocaleString()}円</strong> 
           </ItemCard>
         ))
       ) : (

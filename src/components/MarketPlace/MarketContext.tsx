@@ -53,7 +53,7 @@ export const initialFilters: FilterStateType = {
   sort: null
 };
 
-const BASE_URL = "http://localhost:8080/api/v1/artworks";
+const BASE_URL = "http://52.79.193.77:8080/api/v1/artworks";
 
 export const MarketProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [products, setProducts] = useState<Product[]>([]);

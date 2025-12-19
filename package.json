@@ -27,10 +27,10 @@
     "vite": "^7.2.7"
   },
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
+    "dev": "vite --host 0.0.0.0 --port 3000",
+    "build": "vite build",
     "preview": "vite preview"
-  },
+ },
   "browserslist": [
     ">0.2%",
     "not dead",

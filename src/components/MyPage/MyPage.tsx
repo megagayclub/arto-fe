@@ -76,10 +76,10 @@ const ProductItem: React.FC<ProductProps> = ({
 // ... OrderSummary, MySidebarMenu, MySection 코드는 동일 (생략 가능하나 유지함) ...
 const OrderSummary: React.FC = () => {
   const statuses = [
-    { label: "결제진행 / 완료", count: 0 },
-    { label: "배송준비 중", count: 0 },
-    { label: "배송중", count: 0 },
-    { label: "배송완료", count: 0 },
+    { label: "決済中 / 決済完了", count: 0 },
+    { label: "発送準備中", count: 0 },
+    { label: "配送中", count: 0 },
+    { label: "配送完了", count: 0 },
   ];
   return (
     <OrderSummaryContainer>
@@ -105,11 +105,11 @@ const MySidebarMenu: React.FC = () => {
   return (
     <>
       <AccountInfoBox>
-        <h3>회원정보</h3>
+        <h3>会員情報</h3>
         <p>E-mail(ID):</p>
         <p><strong>{userEmail || "로그인 정보 없음"}</strong></p>
-        <Button>비밀번호 변경</Button>
-        <Button>회원 탈퇴</Button>
+        <Button>パスワード変更</Button>
+        <Button>退会</Button>
       </AccountInfoBox>
       <MyMenu>
         {menuItems.map((item) => (
