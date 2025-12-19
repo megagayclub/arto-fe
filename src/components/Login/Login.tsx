@@ -22,7 +22,7 @@ const LoginComponentBase: React.FC<LayoutProps> = ({ children }) => {
   return (
     <PageWrapper>
       <FormContainer>
-        <Title>로그인</Title>
+        <Title>ログイン</Title>
         {children}
       </FormContainer>
     </PageWrapper>
@@ -52,11 +52,11 @@ const RememberMe: React.FC = () => (
   <CheckboxGroup>
     <label>
       <input type="checkbox" name="rememberMe" />
-      <span>로그인 상태 유지</span>
+      <span>ログイン状態を保持する</span>
     </label>
     <label>
       <input type="checkbox" name="keepLoggedIn" />
-      <span>ID를 저장합니다</span>
+      <span>IDを保存します</span>
     </label>
   </CheckboxGroup>
 );

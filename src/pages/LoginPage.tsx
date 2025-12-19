@@ -76,10 +76,10 @@ const LoginPage: React.FC = () => {
           </Login.Action>
 
           <Login.Action type="button" onClick={handleRegister} disabled={isLoading}>
-            회원 등록
+            会員登録
           </Login.Action>
             
-            <Login.Action onClick={handleForgotPassword}>비밀번호 찾기</Login.Action>
+            <Login.Action onClick={handleForgotPassword}>パスワードを忘れた方</Login.Action>
         </Login.Form>
       </Login>
     </>
